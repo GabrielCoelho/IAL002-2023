@@ -5,11 +5,21 @@
 int main(int argc, char *argv[])
 {
   int arrayExample[5], i;
-  printf("Inform us 5 numbers below\n");
+  int number;
+
+  printf("Inform us an integer number\n");
+  scanf("%d", &number);
+  for (i=0;i<(sizeof arrayExample / sizeof arrayExample[0]);i++) 
+  {
+    arrayExample[i] = number -(i+1);
+  }
+
+  /** Older version of this example
+   * printf("Inform us 5 numbers below\n");
   for (i=0;i<(sizeof arrayExample / sizeof arrayExample[0]);i++) 
   {
     scanf("%d", &arrayExample[i]);
-  }
+  }*/
   printf("The result is:\n");
   for (i=0;i<(sizeof arrayExample / sizeof arrayExample[0]);i++) 
   {
