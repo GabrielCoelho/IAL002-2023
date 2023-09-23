@@ -9,9 +9,18 @@
 int main(int argc, char *argv[])
 {
   int quantityV, selectNumFrom, position;
-  printf("Digite um número para o seu vetor: \n");
-  scanf("%d", &quantityV);
-
+  bool plausibleArray = false;
+  while (!plausibleArray) {
+  
+    printf("Digite um número para o seu vetor: \n");
+    scanf("%d", &quantityV);
+    if (quantityV>10) 
+    {
+      printf("Escolha um número plausível para o Array (evite deixalo muito grande)\n\n");
+    }else {
+      plausibleArray = true;
+    }
+  }
   int dimensionalArray[quantityV];
   int midNumber; 
   if (quantityV%2 == 0) 
@@ -50,14 +59,19 @@ int main(int argc, char *argv[])
     if (selectNumFrom == dimensionalArray[i]) 
     {
       printf("Encontramos o número!!!\n");
-      position = i+1;
+      position = i;
+      
       printf("O número pesquisado (%d) está na %dª posição do seu array dinâmico\n", selectNumFrom, (position+0));
     }
     else if(!position)
     {
-      printf("Não temos nenhum número %d em nossa posição %d do array\n", selectNumFrom, i);
+      printf("Não temos nenhum número %d em nosso array\n", selectNumFrom);
 
     }
+  }
+  if (!position) 
+  {
+    printf("Não foi encontrado o número procurado\nEncerrando o programa...");
   }
   return EXIT_SUCCESS;
 }
