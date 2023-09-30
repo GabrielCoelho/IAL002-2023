@@ -17,12 +17,12 @@
 int main(int argc, char *argv[])
 {
   //Variable Declaration
-  float round[3][3];
-  int motorcycles[3][3];
+  float round[3][3], podium[3];
+  int motorcycles[3];
   int avaliation=1, option; 
   bool notAvailable[3];
 
-  for (int x=0;i<3;i++) 
+  for (int i=0;i<3;i++) 
   {
     notAvailable[i] = true;
   } 
@@ -31,15 +31,15 @@ int main(int argc, char *argv[])
   printf("Nossas motos:\n1.Suzuki Hayabusa\n2.Honda CBR 1000RR-R Fireblade\n3.BMW S1000 RR\n");
   while (avaliation<=3) 
   {
-    printf("\nDigite qual dessas motos você quer analisar primeiro: ");
+    printf("\nDigite qual dessas motos você quer analisar: ");
     scanf("%d", &option);
-    notAvailable[option-1] = false;
     if (option==1) 
     {
       if (notAvailable[0]) 
       {
+        notAvailable[0] = false;
         printf("Analisando a moto: Suzuki Hayabusa\n");
-        for (int i=0;i<3;int++) 
+        for (int i=0;i<3;i++) 
         {
           printf("Digite o tempo da %dª volta: \n", i+1);
           scanf("%f", &round[0][i]);
@@ -55,8 +55,9 @@ int main(int argc, char *argv[])
     {
       if (notAvailable[1]) 
       {
+        notAvailable[1] = false;
         printf("Analisando a moto: Honda CBR 1000RR-R Fireblade\n");
-        for (int i=0;i<3;int++) 
+        for (int i=0;i<3;i++) 
         {
           printf("Digite o tempo da %dª volta: \n", i+1);
           scanf("%f", &round[1][i]);
@@ -67,12 +68,14 @@ int main(int argc, char *argv[])
       {
         printf("Moto já analisada\n");
       }
+    }
     else if (option==3) 
     {
       if (notAvailable[2]) 
       {
+        notAvailable[2] = false;
         printf("Analisando a moto: BMW S1000 RR\n");
-        for (int i=0;i<3;int++) 
+        for (int i=0;i<3;i++) 
         {
           printf("Digite o tempo da %dª volta: \n", i+1);
           scanf("%f", &round[2][i]);
@@ -83,13 +86,84 @@ int main(int argc, char *argv[])
       {
         printf("Moto já analisada\n");
       }
-
+    }
     else
     {
       printf("Por favor, digite um número de um a três, conforme descrito\n");
     }
   }
 
-   
+  
+  float lessTime[3][2];
+  for (int i=0;i<3;i++) 
+  {
+    if (round[i][0] > round[i][1] && round[i][0]>round[i][2]) 
+    {
+      lessTime[i][0] = round[i][1];
+      lessTime[i][1] = round[i][2];
+    }
+    else if (round[i][1] > round[i][0] && round[i][1]>round[i][2]) 
+    {
+      lessTime[i][0] = round[i][0];
+      lessTime[i][1] = round[i][2];
+    }
+    else 
+    {
+      lessTime[i][0] = round[i][0];
+      lessTime[i][1] = round[i][1];
+    }
+  }
+  
+
+  float media[3];
+  for (int i=0;i<3;i++) 
+  {
+    media[i] = (lessTime[i][0] + lessTime[i][1])/2;
+  }
+  for (int i=0;i<3;i++) {
+      printf("%f\n", media[i]);
+  }
+  if (media[0] < media[1] && media[0] < media[2]) {
+    podium[0] = media[0];
+    if (media[1] < media[2]) {
+      podium[1] = media[1];
+      podium[2] = media[2];
+    }else {
+      motorcycles[1] = 2;
+      motorcycles[2] = 1;
+      podium[1] = media[2];
+      podium[2] = media[1];
+    }
+  }
+  else if (media[1] < media[0] && media[1] < media[2]) {
+    motorcycles[0] = 2;
+    podium[0] = media[1];
+    if (media[0] < media[2]) {
+      podium[1] = media[0];
+      podium[2] = media[2];
+      motorcycles[1] = 1;
+    }else {
+      podium[1] = media[2];
+      podium[2] = media[0];
+      motorcycles[1] = 3;
+      motorcycles[2] = 1;
+    }
+  }else if (media[2] < media[1] && media[2] < media[0]) {
+    podium[0] = media[2];
+    motorcycles[0] = 3;
+    if (media[1] < media[0]) {
+      podium[1] = media[1];
+      podium[2] = media[0];
+      motorcycles[1] = 2;
+      motorcycles[2] = 1;
+    }else {
+      podium[1] = media[0];
+      podium[2] = media[1];
+      motorcycles[1] = 1;
+      motorcycles[2] = 2;
+    }
+  }
+
+  printf("Com base nos dados das voltas apresentados, chegamos à seguinte conclusão:\n\nEm primeiro lugar ficou a %dª moto, com média de %.2f\nEm segundo lugar ficou a %dª moto com média de %.2f\nEm terceiro lugar ficou a %dª moto com média de %.2f\n\n", motorcycles[0], podium[0], motorcycles[1], podium[1], motorcycles[2], podium[2]);
   return EXIT_SUCCESS;
 }
