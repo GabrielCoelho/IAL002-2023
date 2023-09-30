@@ -120,17 +120,18 @@ int main(int argc, char *argv[])
   {
     media[i] = (lessTime[i][0] + lessTime[i][1])/2;
   }
-  for (int i=0;i<3;i++) {
-      printf("%f\n", media[i]);
-  }
+
   if (media[0] < media[1] && media[0] < media[2]) {
     podium[0] = media[0];
+    motorcycles[0] = 1;
     if (media[1] < media[2]) {
       podium[1] = media[1];
       podium[2] = media[2];
-    }else {
       motorcycles[1] = 2;
-      motorcycles[2] = 1;
+      motorcycles[2] = 3;
+    }else {
+      motorcycles[1] = 3;
+      motorcycles[2] = 2;
       podium[1] = media[2];
       podium[2] = media[1];
     }
@@ -142,6 +143,7 @@ int main(int argc, char *argv[])
       podium[1] = media[0];
       podium[2] = media[2];
       motorcycles[1] = 1;
+      motorcycles[2] = 3;
     }else {
       podium[1] = media[2];
       podium[2] = media[0];
@@ -164,6 +166,6 @@ int main(int argc, char *argv[])
     }
   }
 
-  printf("Com base nos dados das voltas apresentados, chegamos à seguinte conclusão:\n\nEm primeiro lugar ficou a %dª moto, com média de %.2f\nEm segundo lugar ficou a %dª moto com média de %.2f\nEm terceiro lugar ficou a %dª moto com média de %.2f\n\n", motorcycles[0], podium[0], motorcycles[1], podium[1], motorcycles[2], podium[2]);
+  printf("Com base nos dados das voltas apresentados, chegamos à seguinte conclusão:\n\nEm primeiro lugar ficou a %dª moto, com média de %.3f segundos\nEm segundo lugar ficou a %dª moto com média de %.3f segundos\nEm terceiro lugar ficou a %dª moto com média de %.3f segundos\n\n", motorcycles[0], podium[0], motorcycles[1], podium[1], motorcycles[2], podium[2]);
   return EXIT_SUCCESS;
 }
