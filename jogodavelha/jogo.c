@@ -77,9 +77,14 @@ int main(int argc, char *argv[])
       rodada++;
       if(rodada >=6)
       {
+        for (int x=0;x<3;x++) {
+          for (int y=0;y<3;y++) {
+            printf("%c = [%d][%d]\n",velha[x][y],x,y);
+          }
+        }
         for (int i=0;i<3;i++) 
         {
-          if (((velha[i][0] == velha[i][1] && velha[i][0] == velha[i][2]) && velha[i][1] == velha[i][2])) 
+          if ((velha[i][0] != ' ') && (velha[i][0] == velha[i][1]) && ((velha[i][1] == velha[i][2]) && velha[i][2] != ' ')) 
           {
             jogo = false;
             printf("o Jogador %c ganhou a partida (primeiro if)\n", jogador);

@@ -21,6 +21,10 @@ int main(int argc, char *argv[])
   int motorcycles[3];
   int avaliation=1, option; 
   bool notAvailable[3];
+  char moto1[], moto2[], moto3[];
+  moto1[] = 'Suzuki Hayabusa';
+  moto2[] = 'Honda CBR 1000RR-R Fireblade';
+  moto3[] = 'BMW S1000 RR';
 
   for (int i=0;i<3;i++) 
   {
