@@ -50,9 +50,9 @@ int main(int argc, char *argv[]) {
     /* Exibir o vetor */
     case 2:
       if (array_isnot_null) {
-        printf("Exibindo o vetor de 5 posições das quais você já inseriu: %d "
+        printf("Exibindo o vetor de 5 posições das quais você já inseriu: %d/5 "
                "números\n",
-               array_position > 5 ? array_position : array_position - 1);
+               array_position > 5 ? 5 : array_position - 1);
         for (int i = 0; i < 5; i++) {
           printf("Vetor[%d]: %d\n", i + 1, array[i]);
         }
