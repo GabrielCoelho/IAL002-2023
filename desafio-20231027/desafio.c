@@ -10,7 +10,7 @@ char menuMessage() {
   printf("\n2. Exibir/Listar o vetor");
   printf("\n3. Consultar no vetor");
   printf("\n4. Ordenar o vetor (ascendente)");
-  printf("\n5. Sair do programa");
+  printf("\n5. Sair do programa\n");
   return 0;
 }
 
@@ -39,10 +39,10 @@ int main(int argc, char *argv[]) {
                "favor, escolha outra opção\n\n");
         break;
       } else {
-        printf(
-            "Digite um número qualquer para inserirmos na posição %d do vetor",
-            array_position);
-        scanf("%d", &array[array_position]);
+        printf("Digite um número qualquer para inserirmos na posição %d do "
+               "vetor: ",
+               array_position);
+        scanf("%d", &array[array_position - 1]);
         array_position++;
         array_isnot_null = true;
       }
@@ -80,10 +80,10 @@ int main(int argc, char *argv[]) {
             }
           }
           if (found_searched_number) {
-            printf("\nO número %d foi encontrado no vetor na posição %d",
+            printf("\nO número %d foi encontrado no vetor na posição %d\n\n",
                    search, found_searched_position);
           } else {
-            printf("\nO número %d não foi encontrado no vetor", search);
+            printf("\nO número %d não foi encontrado no vetor\n\n", search);
           }
           break;
         case 2:
@@ -95,7 +95,7 @@ int main(int argc, char *argv[]) {
                    "dentre estes\n");
           } else {
             printf("A posição %d escolhida possui o seguinte valor:\n "
-                   "Vetor[%d]: %d",
+                   "Vetor[%d]: %d\n\n",
                    search, search, array[search - 1]);
           }
           break;
@@ -106,30 +106,36 @@ int main(int argc, char *argv[]) {
       } else {
         printf("O vetor está vazio, não sendo possível pesquisar nele\n\n");
       }
+      break;
     /* Ordenar o vetor */
     case 4:
       if (array_isnot_null) {
-        for (int i = 0; i < (sizeof array / sizeof array[0]); i++) {
-          for (int j = 0; j < (sizeof array / sizeof array[0]) - 1 - i; j++) {
-            if (array[j] > array[j + 1]) {
-              tmp_organizer = array[j];
-              array[j] = array[j + 1];
-              array[j + 1] = tmp_organizer;
+        if (array_position <= 5) {
+          printf("Por favor, termine de inserir números no array, pois somente "
+                 "\nserá possível ordená-lo caso ele esteja completo!\n");
+        } else {
+          for (int i = 0; i < (sizeof array / sizeof array[0]); i++) {
+            for (int j = 0; j < (sizeof array / sizeof array[0]) - 1 - i; j++) {
+              if (array[j] > array[j + 1]) {
+                tmp_organizer = array[j];
+                array[j] = array[j + 1];
+                array[j + 1] = tmp_organizer;
+              }
+            }
+          }
+          printf("O vetor foi ordenado! Deseja exibir?\n1. Sim\nOu qualquer "
+                 "outro número para voltar ao menu principal\n");
+          scanf("%d", &sub_menu_option);
+          if (sub_menu_option == 1) {
+            for (int i = 0; i < (sizeof array / sizeof array[0]); i++) {
+              printf("Vetor[%d]: %d\n", i + 1, array[i]);
             }
           }
         }
-        printf("O vetor foi ordenado! Deseja exibir?\n1. Sim\nOu qualquer "
-               "outro número para voltar ao menu principal");
-        scanf("%d", &sub_menu_option);
-        if (sub_menu_option != 1) {
-          break;
-        } else {
-          for (int i = 0; i < (sizeof array / sizeof array[0]); i++) {
-            printf("Vetor[%d]: %d\n", i + 1, array[i]);
-          }
-          break;
-        }
+      } else {
+        printf("O vetor está vazio, não sendo possível ordená-lo\n\n");
       }
+      break;
     /* sair do programa */
     case 5:
       printf("Saindo do programa...\n\n");
