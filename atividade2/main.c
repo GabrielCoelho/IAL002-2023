@@ -28,7 +28,7 @@ struct Cliente {
 
 int main(int argc, char *argv[]) {
   struct Cliente *clientes;
-  int agencia = 0, num_clientes, iterador_cod = 1;
+  int agencia = 0, num_clientes, iterador_cod = 1, line_break, linhas_dbo;
   FILE *fro;
   FILE *fwr;
 
@@ -65,6 +65,13 @@ int main(int argc, char *argv[]) {
       break;
     }
   }
+
+  do {
+    line_break = fgetc(fro);
+    if (line_break == '\n')
+      linhas_dbo++;
+  } while (line_break != EOF);
+  printf("Linhas no arquivo teste %d", linhas_dbo);
   // Procurar pelo arquivo de mesmo nome. Caso não exista, criar nova agência
   // Checar quantidade de linhas no arquivo para gerar o número de clientes a
   // partir da seguinte fórmula: num_clientes = (50-nlinhas) + nlinhas;
