@@ -39,8 +39,8 @@ struct Cliente {
 };
 
 int main(int argc, char *argv[]) {
-  struct Cliente clientes[10];
-  // clientes = (struct Cliente *)malloc(10 * sizeof(struct Cliente));
+  struct Cliente *clientes;
+  clientes = (struct Cliente *)malloc(10 * sizeof(struct Cliente));
   bool conta_encontrada = false;
   int agencia = 0, num_clientes, iterador_cod = 1, line_break, linhas_dbo = 0,
       menu_gerente = 0, sub_menu;
@@ -87,19 +87,22 @@ int main(int argc, char *argv[]) {
     if (line_break == '\n')
       linhas_dbo++;
   }
-  int cod_teste;
+  int tmp_cod, tmp_ag, tmp_conta, tmp_pix;
+  char tmp_nome[15], tmp_sobre[20];
+  double tmp_saldo;
   num_clientes = (10 - linhas_dbo);
+  rewind(arquivo_agencia);
   for (int i = 0; i < linhas_dbo; i++) {
     fscanf(arquivo_agencia, "%d %d %s %s %d %lf %d",
-           &clientes[i].codigo_cliente, &clientes[i].agencia_num,
-           clientes[i].nome_cliente, clientes[i].sobrenome_cliente,
-           &clientes[i].conta_corrente, &clientes[i].saldo_atual,
-           &clientes[i].chave_pix);
+           &(clientes + i)->codigo_cliente, &(clientes + i)->agencia_num,
+           (clientes + i)->nome_cliente, (clientes + i)->sobrenome_cliente,
+           &(clientes + i)->conta_corrente, &(clientes + i)->saldo_atual,
+           &(clientes + i)->chave_pix);
     printf("\nCod %d\nAgencia %d\nNome: %s %s\nConta %d\nSaldo %lf\nPIX %d\n",
-           clientes[i].codigo_cliente, clientes[i].agencia_num,
-           clientes[i].nome_cliente, clientes[i].sobrenome_cliente,
-           clientes[i].conta_corrente, clientes[i].saldo_atual,
-           clientes[i].chave_pix);
+           (clientes + i)->codigo_cliente, (clientes + i)->agencia_num,
+           (clientes + i)->nome_cliente, (clientes + i)->sobrenome_cliente,
+           (clientes + i)->conta_corrente, (clientes + i)->saldo_atual,
+           (clientes + i)->chave_pix);
   }
   return 0;
   printf("\n\n Agência %d\nNúmero de Clientes cadastrados %d/10\nNúmero de "
