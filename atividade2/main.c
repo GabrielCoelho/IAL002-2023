@@ -39,14 +39,52 @@ struct Cliente {
 };
 
 int movimentacaoConta(struct Cliente *conta, int indice) {
-  sleep(5);
   system("clear");
   printf("----------------------------------------\n");
   printf("--------- Movimentação da Conta: -------\n");
-  printf("---- Ag: %d ------------ Conta: %d -----\n",
-         (conta + indice)->agencia_num, (conta + indice)->conta_corrente);
+  printf("---- Ag: %d -------- Conta: %d ----\n", (conta + indice)->agencia_num,
+         (conta + indice)->conta_corrente);
+  printf("--------- Cliente %s %s   \n", (conta + indice)->nome_cliente,
+         (conta + indice)->sobrenome_cliente);
   printf("----------------------------------------\n\n\n");
+  int opcao = 0;
+  while (opcao == 0) {
+    printf("Selecione a partir do menu abaixo: \n1. Saque\t2. Depósito\t3. "
+           "Pix\t4. Transferência\n9. Voltar ao menu principal\n");
+    scanf("%d", &opcao);
+    switch (opcao) {
+    case 1:
+      break;
+    case 2:
+      break;
+    case 3:
+      break;
+    case 4:
+      break;
+    case 9:
+      return 1;
+      break;
+    default:
+      printf("Por favor, selecione um item existente no menu");
+      opcao = 0;
+      break;
+    }
+  }
+  return 0;
+}
 
+double exibeSaldoConta(struct Cliente *conta, int indice) {
+  system("clear");
+  printf("----------------------------------------\n");
+  printf("--------- Saldo da Conta: -------\n");
+  printf("---- Ag: %d -------- Conta: %d ----\n", (conta + indice)->agencia_num,
+         (conta + indice)->conta_corrente);
+  printf("--------- Cliente %s %s   \n", (conta + indice)->nome_cliente,
+         (conta + indice)->sobrenome_cliente);
+  printf("--------- SALDO: R$ %.2lf\n", (conta + indice)->saldo_atual);
+  printf("----------------------------------------\n\n\n");
+  printf("Retornando ao menu gerencial em 5 segundos...\n\n");
+  sleep(5);
   return 0;
 }
 
@@ -128,7 +166,7 @@ int main(int argc, char *argv[]) {
       for (int i = 0; i < linhas_dbo; i++) {
         if (sub_menu == (clientes + i)->conta_corrente) {
           printf("A conta desejada consta em nosso banco de dados\nVocê será "
-                 "direcionado para a movimentação da mesma em breve");
+                 "direcionado para a movimentação da mesma em breve\n\n");
           conta_encontrada = true;
           indice_movimentacao_conta = i;
         }
@@ -141,12 +179,40 @@ int main(int argc, char *argv[]) {
         sub_menu = 0;
         menu_gerente = 0;
       } else {
-        movimentacaoConta(clientes, indice_movimentacao_conta);
+        sleep(2);
+        sub_menu = movimentacaoConta(clientes, indice_movimentacao_conta);
+        if (sub_menu == 1) {
+          menu_gerente = 0;
+          sub_menu = 0;
+        }
       }
       break;
     case 2:
       break;
     case 3:
+      printf("\n\nDigite o número da conta desejada: ");
+      scanf("%d", &sub_menu);
+      for (int i = 0; i < linhas_dbo; i++) {
+        if (sub_menu == (clientes + i)->conta_corrente) {
+          printf("A conta desejada consta em nosso banco de dados\nVocê será "
+                 "direcionado para a movimentação da mesma em breve\n\n");
+          conta_encontrada = true;
+          indice_movimentacao_conta = i;
+        }
+      }
+      if (!conta_encontrada) {
+        printf("A conta digitada não foi encontrada, certifique-se de que o "
+               "cliente informou a conta certa\nAguarde enquanto retornamos ao "
+               "menu de gerência...\n\n");
+        sleep(5);
+        sub_menu = 0;
+        menu_gerente = 0;
+      } else {
+        sleep(2);
+        exibeSaldoConta(clientes, indice_movimentacao_conta);
+        menu_gerente = 0;
+        sub_menu = 0;
+      }
       break;
     case 9:
       printf("Saindo do programa\n\n");
