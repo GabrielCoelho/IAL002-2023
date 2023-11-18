@@ -7,6 +7,19 @@
 
 /* Integrantes: Gabriel Coelho Soares
  */
+// int movimentacaoConta(struct *conta) {}
+int exibeMenuGerente() {
+  system("clear");
+  printf("----------------------------------------\n");
+  printf("-------- Menu Gerencial do Banco -------\n");
+  printf("----------------------------------------\n\n\n");
+  printf("Movimentação de conta            Abrir nova Conta                 "
+         "Exibir Saldo\n   - Sacar quantia   "
+         "            - Cadastro de novo cliente                    - Exibe na "
+         "tela o saldo atual\n   - Depositar quantia\n  "
+         " - Efetuar PIX\n   - Transferência\n\n");
+  return 0;
+}
 int inicioBanco() {
   system("clear");
   printf("----------------------------------------\n");
@@ -18,17 +31,20 @@ int inicioBanco() {
 }
 
 struct Cliente {
-  int codigo_cliente;     // Código automático
-  int agencia_num;        // Número da agência setado no início do programa
-  char nome_cliente[140]; // String
-  char conta_corrente[8]; // String de 6 números, um traço e um dígito final
+  int codigo_cliente; // Código automático
+  int agencia_num;    // Número da agência setado no início do programa
+  char nome_cliente[15];
+  char sobrenome_cliente[20]; // String
+  int conta_corrente;         // Conta com 6 digitos
   double saldo_atual;
-  int chave_pix;
+  int chave_pix; // numero da agencia + codigo_cliente
 };
 
 int main(int argc, char *argv[]) {
-  struct Cliente *clientes;
-  int agencia = 0, num_clientes, iterador_cod = 1, line_break, linhas_dbo = 0;
+  struct Cliente clientes[10];
+  bool conta_encontrada = false;
+  int agencia = 0, num_clientes, iterador_cod = 1, line_break, linhas_dbo = 0,
+      menu_gerente = 0, sub_menu;
   FILE *fro;
   FILE *fwr;
 
@@ -72,9 +88,58 @@ int main(int argc, char *argv[]) {
     if (line_break == '\n')
       linhas_dbo++;
   }
-  // Procurar pelo arquivo de mesmo nome. Caso não exista, criar nova agência
-  // Checar quantidade de linhas no arquivo para gerar o número de clientes a
-  // partir da seguinte fórmula: num_clientes = (50-nlinhas) + nlinhas;
+  num_clientes = (10 - linhas_dbo);
+  for (int i = 0; i < linhas_dbo; i++) {
+    fscanf(fro, "%d", &clientes[i].codigo_cliente);
+    fscanf(fro, "%d", &clientes[i].agencia_num);
+    fscanf(fro, "%s", &clientes[i].nome_cliente);
+    fscanf(fro, "%s", &clientes[i].sobrenome_cliente);
+    fscanf(fro, "%d", &clientes[i].conta_corrente);
+    fscanf(fro, "%lf", &clientes[i].saldo_atual);
+    fscanf(fro, "%d", &clientes[i].chave_pix);
+  }
+  printf("\n\n Agência %d\nNúmero de Clientes cadastrados %d/10\nNúmero de "
+         "vagas %d/10",
+         agencia, linhas_dbo, num_clientes);
+  while (menu_gerente == 0) {
+    exibeMenuGerente();
+    printf("Escolha uma opção:\n1. Movimentar uma Conta\n2. Abrir Conta\n3. "
+           "Consultar saldo de conta\n9. Sair do programa: "); // OU voltar ao
+                                                               // menu principal
+                                                               // (de agências)
+    scanf("%d", &menu_gerente);
+    switch (menu_gerente) {
+    case 1:
+      printf("\n\nDigite o número da conta desejada: ");
+      scanf("%d", &sub_menu);
+      for (int i = 0; i < linhas_dbo; i++) {
+        if (sub_menu == (clientes + i)->conta_corrente) {
+          printf("A conta desejada consta em nosso banco de dados\nVocê será "
+                 "direcionado para a movimentação da mesma em breve");
+          conta_encontrada = true;
+        }
+      }
+      if (!conta_encontrada) {
+        printf("A conta digitada não foi encontrada, certifique-se de que o "
+               "cliente informou a conta certa\n\n");
+        sub_menu = 0;
+        menu_gerente = 0;
+      }
+      // movimentacaoConta();
+      break;
+    case 2:
+      break;
+    case 3:
+      break;
+    case 9:
+      printf("Saindo do programa\n\n");
+      return 0;
+    default:
+      printf("Opção Inexistente\n\n");
+      menu_gerente = 0;
+      break;
+    }
+  }
 
   // printf("Digite a quantidade de clientes cadastrados nessa agência: ");
   // scanf("%d", &num_clientes);

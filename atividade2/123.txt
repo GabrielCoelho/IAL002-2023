@@ -1,2 +1,2 @@
-1 123 Gabriel Soares 00001-X 2900.00 1231
-1 123 Marcos Moreira 00001-0 3897.32 1232
+1 123 Gabriel Soares 000001 2900.00 1231
+1 123 Marcos Moreira 000002 3897.32 1232
