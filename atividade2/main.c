@@ -69,15 +69,22 @@ int movimentacaoConta(struct Cliente *conta, int indice, FILE *f) {
         rewind(f);
         FILE *tmp_file = fopen("agency_copy.txt", "w");
         char c;
+        bool passou = false;
         int tmp_count = 0;
         c = getc(f);
         while (c != EOF) {
           if (c == '\n') {
             tmp_count++;
+            passou = false;
           }
           if (tmp_count != indice) {
-            putc(c, tmp_file);
+            if (!passou) {
+              putc(c, tmp_file);
+            }
           } else {
+            if (indice != 1) {
+              putc(c, tmp_file);
+            }
             fprintf(tmp_file, "%d %d %s %s %d %.2lf %d",
                     (conta + indice)->codigo_cliente,
                     (conta + indice)->agencia_num,
@@ -87,6 +94,7 @@ int movimentacaoConta(struct Cliente *conta, int indice, FILE *f) {
                     (conta + indice)->saldo_atual - saque_deposito,
                     (conta + indice)->chave_pix);
             tmp_count++;
+            passou = true;
           }
           c = getc(f);
         }
