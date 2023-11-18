@@ -3,10 +3,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include <strings.h>
+#include <unistd.h>
 
 /* Integrantes: Gabriel Coelho Soares
  */
-// int movimentacaoConta(struct *conta) {}
 int exibeMenuGerente() {
   system("clear");
   printf("----------------------------------------\n");
@@ -38,12 +38,14 @@ struct Cliente {
   int chave_pix; // numero da agencia + codigo_cliente
 };
 
+int movimentacaoConta(struct Cliente *conta, int indice) { return 0; }
+
 int main(int argc, char *argv[]) {
   struct Cliente *clientes;
   clientes = (struct Cliente *)malloc(10 * sizeof(struct Cliente));
   bool conta_encontrada = false;
   int agencia = 0, num_clientes, iterador_cod = 1, line_break, linhas_dbo = 0,
-      menu_gerente = 0, sub_menu;
+      menu_gerente = 0, sub_menu, indice_movimentacao_conta = 0;
   FILE *arquivo_agencia;
 
   inicioBanco();
@@ -54,19 +56,19 @@ int main(int argc, char *argv[]) {
     switch (agencia) {
     case 123:
       printf("Você escolheu a agência de Mogi Guaçu (123)");
-      arquivo_agencia = fopen("123.txt", "r");
+      arquivo_agencia = fopen("123.txt", "a+");
       break;
     case 125:
       printf("Você escolheu a agência de Mogi Mirim (125)");
-      arquivo_agencia = fopen("125.txt", "r");
+      arquivo_agencia = fopen("125.txt", "a+");
       break;
     case 129:
       printf("Você escolheu a agência de Itapira (129)");
-      arquivo_agencia = fopen("129.txt", "r");
+      arquivo_agencia = fopen("129.txt", "a+");
       break;
     case 130:
       printf("Você escolheu a agência de Estiva Gerbi (130)");
-      arquivo_agencia = fopen("130.txt", "r");
+      arquivo_agencia = fopen("130.txt", "a+");
       break;
     default:
       printf("Você não selecionou nenhuma agência existente!\nPor favor, "
@@ -98,13 +100,7 @@ int main(int argc, char *argv[]) {
            (clientes + i)->nome_cliente, (clientes + i)->sobrenome_cliente,
            &(clientes + i)->conta_corrente, &(clientes + i)->saldo_atual,
            &(clientes + i)->chave_pix);
-    printf("\nCod %d\nAgencia %d\nNome: %s %s\nConta %d\nSaldo %lf\nPIX %d\n",
-           (clientes + i)->codigo_cliente, (clientes + i)->agencia_num,
-           (clientes + i)->nome_cliente, (clientes + i)->sobrenome_cliente,
-           (clientes + i)->conta_corrente, (clientes + i)->saldo_atual,
-           (clientes + i)->chave_pix);
   }
-  return 0;
   printf("\n\n Agência %d\nNúmero de Clientes cadastrados %d/10\nNúmero de "
          "vagas %d/10",
          agencia, linhas_dbo, num_clientes);
@@ -124,15 +120,19 @@ int main(int argc, char *argv[]) {
           printf("A conta desejada consta em nosso banco de dados\nVocê será "
                  "direcionado para a movimentação da mesma em breve");
           conta_encontrada = true;
+          indice_movimentacao_conta = i;
         }
       }
       if (!conta_encontrada) {
         printf("A conta digitada não foi encontrada, certifique-se de que o "
-               "cliente informou a conta certa\n\n");
+               "cliente informou a conta certa\nAguarde enquanto retornamos ao "
+               "menu de gerência...\n\n");
+        sleep(5);
         sub_menu = 0;
         menu_gerente = 0;
+      } else {
+        movimentacaoConta(clientes, indice_movimentacao_conta);
       }
-      // movimentacaoConta();
       break;
     case 2:
       break;
