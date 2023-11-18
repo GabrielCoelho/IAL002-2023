@@ -39,13 +39,12 @@ struct Cliente {
 };
 
 int main(int argc, char *argv[]) {
-  struct Cliente *clientes;
-  clientes = (struct Cliente *)malloc(10 * sizeof(struct Cliente));
+  struct Cliente clientes[10];
+  // clientes = (struct Cliente *)malloc(10 * sizeof(struct Cliente));
   bool conta_encontrada = false;
   int agencia = 0, num_clientes, iterador_cod = 1, line_break, linhas_dbo = 0,
       menu_gerente = 0, sub_menu;
-  FILE *fro;
-  FILE *fwr;
+  FILE *arquivo_agencia;
 
   inicioBanco();
   while (agencia == 0) {
@@ -55,19 +54,19 @@ int main(int argc, char *argv[]) {
     switch (agencia) {
     case 123:
       printf("Você escolheu a agência de Mogi Guaçu (123)");
-      fro = fopen("123.txt", "a+");
+      arquivo_agencia = fopen("123.txt", "r");
       break;
     case 125:
       printf("Você escolheu a agência de Mogi Mirim (125)");
-      fro = fopen("125.txt", "a+");
+      arquivo_agencia = fopen("125.txt", "r");
       break;
     case 129:
       printf("Você escolheu a agência de Itapira (129)");
-      fro = fopen("129.txt", "a+");
+      arquivo_agencia = fopen("129.txt", "r");
       break;
     case 130:
       printf("Você escolheu a agência de Estiva Gerbi (130)");
-      fro = fopen("130.txt", "a+");
+      arquivo_agencia = fopen("130.txt", "r");
       break;
     default:
       printf("Você não selecionou nenhuma agência existente!\nPor favor, "
@@ -76,33 +75,33 @@ int main(int argc, char *argv[]) {
       break;
     }
   }
-  if (fro == NULL) {
+  if (arquivo_agencia == NULL) {
     printf("Arquivo de dados corrompido, por favor, ligue para os "
            "desenvolvedores urgentemente:\nGabriel Coelho: 1970707070\nIan "
            "Camargo: 1970207020\nMarcos Moreira: +9122132488\n");
     return 0;
   }
 
-  for (line_break = getc(fro); line_break != EOF; line_break = getc(fro)) {
+  for (line_break = getc(arquivo_agencia); line_break != EOF;
+       line_break = getc(arquivo_agencia)) {
     if (line_break == '\n')
       linhas_dbo++;
   }
   int cod_teste;
   num_clientes = (10 - linhas_dbo);
   for (int i = 0; i < linhas_dbo; i++) {
-    fscanf(fro, "%d", &(clientes + i)->codigo_cliente);
-    fscanf(fro, "%d", &(clientes + i)->agencia_num);
-    fscanf(fro, "%s", (clientes + i)->nome_cliente);
-    fscanf(fro, "%s", (clientes + i)->sobrenome_cliente);
-    fscanf(fro, "%d", &(clientes + i)->conta_corrente);
-    fscanf(fro, "%lf", &(clientes + i)->saldo_atual);
-    fscanf(fro, "%d", &(clientes + i)->chave_pix);
-    printf("Cod: %d\nAgencia %d\nNome %s %s\nConta %d\nSaldo %lf\nPIX %d\n\n",
-           (clientes + i)->codigo_cliente, (clientes + i)->agencia_num,
-           (clientes + i)->nome_cliente, (clientes + i)->sobrenome_cliente,
-           (clientes + i)->conta_corrente, (clientes + i)->saldo_atual,
-           (clientes + i)->chave_pix);
+    fscanf(arquivo_agencia, "%d %d %s %s %d %lf %d",
+           &clientes[i].codigo_cliente, &clientes[i].agencia_num,
+           clientes[i].nome_cliente, clientes[i].sobrenome_cliente,
+           &clientes[i].conta_corrente, &clientes[i].saldo_atual,
+           &clientes[i].chave_pix);
+    printf("\nCod %d\nAgencia %d\nNome: %s %s\nConta %d\nSaldo %lf\nPIX %d\n",
+           clientes[i].codigo_cliente, clientes[i].agencia_num,
+           clientes[i].nome_cliente, clientes[i].sobrenome_cliente,
+           clientes[i].conta_corrente, clientes[i].saldo_atual,
+           clientes[i].chave_pix);
   }
+  return 0;
   printf("\n\n Agência %d\nNúmero de Clientes cadastrados %d/10\nNúmero de "
          "vagas %d/10",
          agencia, linhas_dbo, num_clientes);
