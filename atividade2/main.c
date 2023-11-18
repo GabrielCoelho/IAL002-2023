@@ -38,7 +38,7 @@ struct Cliente {
   int chave_pix; // numero da agencia + codigo_cliente
 };
 
-int movimentacaoConta(struct Cliente *conta, int indice) {
+int movimentacaoConta(struct Cliente *conta, int indice, FILE *f) {
   system("clear");
   printf("----------------------------------------\n");
   printf("--------- Movimentação da Conta: -------\n");
@@ -48,12 +48,53 @@ int movimentacaoConta(struct Cliente *conta, int indice) {
          (conta + indice)->sobrenome_cliente);
   printf("----------------------------------------\n\n\n");
   int opcao = 0;
+  double saque_deposito;
   while (opcao == 0) {
     printf("Selecione a partir do menu abaixo: \n1. Saque\t2. Depósito\t3. "
            "Pix\t4. Transferência\n9. Voltar ao menu principal\n");
     scanf("%d", &opcao);
     switch (opcao) {
     case 1:
+      printf("Digite a quantidade que deseja sacar: ");
+      scanf("%lf", &saque_deposito);
+      if (saque_deposito > (conta + indice)->saldo_atual) {
+        printf("Quantia desejada maior que saldo disponível, por favor, "
+               "escolha um valor entre: R$0.00 - R$%.2lf\n\n",
+               (conta + indice)->saldo_atual);
+        sleep(1);
+        opcao = 0;
+      } else {
+        printf("Preparando para realizar o saque...");
+        sleep(2);
+        rewind(f);
+        FILE *tmp_file = fopen("agency_copy.txt", "w");
+        char c;
+        int tmp_count = 0;
+        c = getc(f);
+        while (c != EOF) {
+          if (c == '\n') {
+            tmp_count++;
+          }
+          if (tmp_count != indice) {
+            putc(c, tmp_file);
+          } else {
+            fprintf(tmp_file, "%d %d %s %s %d %.2lf %d",
+                    (conta + indice)->codigo_cliente,
+                    (conta + indice)->agencia_num,
+                    (conta + indice)->nome_cliente,
+                    (conta + indice)->sobrenome_cliente,
+                    (conta + indice)->conta_corrente,
+                    (conta + indice)->saldo_atual - saque_deposito,
+                    (conta + indice)->chave_pix);
+            tmp_count++;
+          }
+          c = getc(f);
+        }
+        fclose(f);
+        fclose(tmp_file);
+        remove("123.txt");
+        rename("agency_copy.txt", "123.txt");
+      }
       break;
     case 2:
       break;
@@ -137,9 +178,6 @@ int main(int argc, char *argv[]) {
     if (line_break == '\n')
       linhas_dbo++;
   }
-  int tmp_cod, tmp_ag, tmp_conta, tmp_pix;
-  char tmp_nome[15], tmp_sobre[20];
-  double tmp_saldo;
   num_clientes = (10 - linhas_dbo);
   rewind(arquivo_agencia);
   for (int i = 0; i < linhas_dbo; i++) {
@@ -180,7 +218,8 @@ int main(int argc, char *argv[]) {
         menu_gerente = 0;
       } else {
         sleep(2);
-        sub_menu = movimentacaoConta(clientes, indice_movimentacao_conta);
+        sub_menu = movimentacaoConta(clientes, indice_movimentacao_conta,
+                                     arquivo_agencia);
         if (sub_menu == 1) {
           menu_gerente = 0;
           sub_menu = 0;
