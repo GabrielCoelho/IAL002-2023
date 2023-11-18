@@ -28,7 +28,7 @@ struct Cliente {
 
 int main(int argc, char *argv[]) {
   struct Cliente *clientes;
-  int agencia = 0, num_clientes, iterador_cod = 1, line_break, linhas_dbo;
+  int agencia = 0, num_clientes, iterador_cod = 1, line_break, linhas_dbo = 0;
   FILE *fro;
   FILE *fwr;
 
@@ -41,22 +41,18 @@ int main(int argc, char *argv[]) {
     case 123:
       printf("Você escolheu a agência de Mogi Guaçu (123)");
       fro = fopen("123.txt", "r");
-      fwr = fopen("123.txt", "wb");
       break;
     case 125:
       printf("Você escolheu a agência de Mogi Mirim (125)");
       fro = fopen("125.txt", "r");
-      fwr = fopen("125.txt", "wb");
       break;
     case 129:
       printf("Você escolheu a agência de Itapira (129)");
       fro = fopen("129.txt", "r");
-      fwr = fopen("129.txt", "wb");
       break;
     case 130:
       printf("Você escolheu a agência de Estiva Gerbi (130)");
       fro = fopen("130.txt", "r");
-      fwr = fopen("130.txt", "wb");
       break;
     default:
       printf("Você não selecionou nenhuma agência existente!\nPor favor, "
@@ -65,13 +61,17 @@ int main(int argc, char *argv[]) {
       break;
     }
   }
+  if (fro == NULL) {
+    printf("Arquivo de dados corrompido, por favor, ligue para os "
+           "desenvolvedores urgentemente:\nGabriel Coelho: 1970707070\nIan "
+           "Camargo: 1970207020\nMarcos Moreira: +9122132488\n");
+    return 0;
+  }
 
-  do {
-    line_break = fgetc(fro);
+  for (line_break = getc(fro); line_break != EOF; line_break = getc(fro)) {
     if (line_break == '\n')
       linhas_dbo++;
-  } while (line_break != EOF);
-  printf("Linhas no arquivo teste %d", linhas_dbo);
+  }
   // Procurar pelo arquivo de mesmo nome. Caso não exista, criar nova agência
   // Checar quantidade de linhas no arquivo para gerar o número de clientes a
   // partir da seguinte fórmula: num_clientes = (50-nlinhas) + nlinhas;
