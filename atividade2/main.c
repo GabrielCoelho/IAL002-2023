@@ -7,6 +7,15 @@
 
 /* Integrantes: Gabriel Coelho Soares
  */
+int inicioBanco() {
+  system("clear");
+  printf("----------------------------------------\n");
+  printf("------ Banco do Batata - v1.0.0 --------\n");
+  printf("----------------------------------------\n\n\n");
+  printf("Agências em toda a região da Baixa Mogiana \n123 - Mogi Guaçu    125 "
+         "- Mogi Mirim    129 - Itapira    130 - Estiva Gerbi\n");
+  return 0;
+}
 
 struct Cliente {
   int codigo_cliente;     // Código automático
@@ -14,16 +23,23 @@ struct Cliente {
   char nome_cliente[140]; // String
   char conta_corrente[8]; // String de 6 números, um traço e um dígito final
   double saldo_atual;
+  int chave_pix;
 };
 
 int main(int argc, char *argv[]) {
   struct Cliente *clientes;
   int agencia, num_clientes, iterador_cod = 1;
+  FILE *fro;
+  FILE *fwr;
 
-  printf("Banco do Batata - v1.0.0");
+  inicioBanco();
   printf("\n\nDigite o número da agência que você deseja controlar: ");
   scanf("%d", &agencia);
 
+  switch (agencia) {
+  case 123:
+    printf("Você escolheu a agência 123:");
+  }
   // Procurar pelo arquivo de mesmo nome. Caso não exista, criar nova agência
   // Checar quantidade de linhas no arquivo para gerar o número de clientes a
   // partir da seguinte fórmula: num_clientes = (50-nlinhas) + nlinhas;
