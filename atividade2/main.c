@@ -82,7 +82,7 @@ int movimentacaoConta(struct Cliente *conta, int indice, FILE *f) {
               putc(c, tmp_file);
             }
           } else {
-            if (indice != 1) {
+            if (c == '\n') {
               putc(c, tmp_file);
             }
             fprintf(tmp_file, "%d %d %s %s %d %.2lf %d",
