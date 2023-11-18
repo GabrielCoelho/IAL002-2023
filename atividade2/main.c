@@ -12,11 +12,10 @@ int exibeMenuGerente() {
   printf("----------------------------------------\n");
   printf("-------- Menu Gerencial do Banco -------\n");
   printf("----------------------------------------\n\n\n");
-  printf("Movimentação de conta            Abrir nova Conta                 "
-         "Exibir Saldo\n   - Sacar quantia   "
-         "            - Cadastro de novo cliente                    - Exibe na "
-         "tela o saldo atual\n   - Depositar quantia\n  "
-         " - Efetuar PIX\n   - Transferência\n\n");
+  printf("Movimentação de conta\t\tAbrir nova Conta\t\tExibir Saldo\n   - "
+         "Sacar quantia\t\t- Cadastro de novo cliente\t- Exibe na tela o "
+         "saldo atual\n   - Depositar quantia\n   - Efetuar PIX\n   - "
+         "Transferência\n\n");
   return 0;
 }
 int inicioBanco() {
@@ -24,8 +23,8 @@ int inicioBanco() {
   printf("----------------------------------------\n");
   printf("------ Banco do Batata - v1.0.0 --------\n");
   printf("----------------------------------------\n\n\n");
-  printf("Agências em toda a região da Baixa Mogiana \n123 - Mogi Guaçu    125 "
-         "- Mogi Mirim    129 - Itapira    130 - Estiva Gerbi\n");
+  printf("Agências em toda a região da Baixa Mogiana \n123 - Mogi Guaçu\t125 "
+         "- Mogi Mirim\t129 - Itapira\t130 - Estiva Gerbi\n");
   return 0;
 }
 
@@ -56,19 +55,19 @@ int main(int argc, char *argv[]) {
     switch (agencia) {
     case 123:
       printf("Você escolheu a agência de Mogi Guaçu (123)");
-      fro = fopen("123.txt", "r");
+      fro = fopen("123.txt", "a+");
       break;
     case 125:
       printf("Você escolheu a agência de Mogi Mirim (125)");
-      fro = fopen("125.txt", "r");
+      fro = fopen("125.txt", "a+");
       break;
     case 129:
       printf("Você escolheu a agência de Itapira (129)");
-      fro = fopen("129.txt", "r");
+      fro = fopen("129.txt", "a+");
       break;
     case 130:
       printf("Você escolheu a agência de Estiva Gerbi (130)");
-      fro = fopen("130.txt", "r");
+      fro = fopen("130.txt", "a+");
       break;
     default:
       printf("Você não selecionou nenhuma agência existente!\nPor favor, "
