@@ -38,7 +38,17 @@ struct Cliente {
   int chave_pix; // numero da agencia + codigo_cliente
 };
 
-int movimentacaoConta(struct Cliente *conta, int indice) { return 0; }
+int movimentacaoConta(struct Cliente *conta, int indice) {
+  sleep(5);
+  system("clear");
+  printf("----------------------------------------\n");
+  printf("--------- Movimentação da Conta: -------\n");
+  printf("---- Ag: %d ------------ Conta: %d -----\n",
+         (conta + indice)->agencia_num, (conta + indice)->conta_corrente);
+  printf("----------------------------------------\n\n\n");
+
+  return 0;
+}
 
 int main(int argc, char *argv[]) {
   struct Cliente *clientes;
