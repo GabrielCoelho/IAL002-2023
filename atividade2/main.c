@@ -41,7 +41,8 @@ struct Cliente {
 };
 
 int main(int argc, char *argv[]) {
-  struct Cliente clientes[10];
+  struct Cliente *clientes;
+  clientes = (struct Cliente *)malloc(10 * sizeof(struct Cliente));
   bool conta_encontrada = false;
   int agencia = 0, num_clientes, iterador_cod = 1, line_break, linhas_dbo = 0,
       menu_gerente = 0, sub_menu;
@@ -88,15 +89,21 @@ int main(int argc, char *argv[]) {
     if (line_break == '\n')
       linhas_dbo++;
   }
+  int cod_teste;
   num_clientes = (10 - linhas_dbo);
   for (int i = 0; i < linhas_dbo; i++) {
-    fscanf(fro, "%d", &clientes[i].codigo_cliente);
-    fscanf(fro, "%d", &clientes[i].agencia_num);
-    fscanf(fro, "%s", &clientes[i].nome_cliente);
-    fscanf(fro, "%s", &clientes[i].sobrenome_cliente);
-    fscanf(fro, "%d", &clientes[i].conta_corrente);
-    fscanf(fro, "%lf", &clientes[i].saldo_atual);
-    fscanf(fro, "%d", &clientes[i].chave_pix);
+    fscanf(fro, "%d", &(clientes + i)->codigo_cliente);
+    fscanf(fro, "%d", &(clientes + i)->agencia_num);
+    fscanf(fro, "%s", (clientes + i)->nome_cliente);
+    fscanf(fro, "%s", (clientes + i)->sobrenome_cliente);
+    fscanf(fro, "%d", &(clientes + i)->conta_corrente);
+    fscanf(fro, "%lf", &(clientes + i)->saldo_atual);
+    fscanf(fro, "%d", &(clientes + i)->chave_pix);
+    printf("Cod: %d\nAgencia %d\nNome %s %s\nConta %d\nSaldo %lf\nPIX %d\n\n",
+           (clientes + i)->codigo_cliente, (clientes + i)->agencia_num,
+           (clientes + i)->nome_cliente, (clientes + i)->sobrenome_cliente,
+           (clientes + i)->conta_corrente, (clientes + i)->saldo_atual,
+           (clientes + i)->chave_pix);
   }
   printf("\n\n Agência %d\nNúmero de Clientes cadastrados %d/10\nNúmero de "
          "vagas %d/10",
