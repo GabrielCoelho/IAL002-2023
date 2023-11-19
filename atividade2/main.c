@@ -38,7 +38,8 @@ struct Cliente {
   int chave_pix; // numero da agencia + codigo_cliente
 };
 
-int movimentacaoConta(struct Cliente *conta, int indice, FILE *f) {
+int movimentacaoConta(struct Cliente *conta, int indice, FILE *f,
+                      char *file_name) {
   system("clear");
   printf("----------------------------------------\n");
   printf("--------- Movimentação da Conta: -------\n");
@@ -64,10 +65,10 @@ int movimentacaoConta(struct Cliente *conta, int indice, FILE *f) {
         sleep(1);
         opcao = 0;
       } else {
-        printf("Preparando para realizar o saque...");
+        printf("Preparando para realizar o saque...\n\n");
         sleep(2);
         rewind(f);
-        FILE *tmp_file = fopen("agency_copy.txt", "w");
+        FILE *tmp_file = fopen("agency_copy.tbd", "w");
         char c;
         bool passou = false;
         int tmp_count = 0;
@@ -100,11 +101,59 @@ int movimentacaoConta(struct Cliente *conta, int indice, FILE *f) {
         }
         fclose(f);
         fclose(tmp_file);
-        remove("123.txt");
-        rename("agency_copy.txt", "123.txt");
+        remove(file_name);
+        rename("agency_copy.tbd", file_name);
+        opcao = 0;
       }
       break;
     case 2:
+      printf("Digite a quantidade que deseja depositar: ");
+      scanf("%lf", &saque_deposito);
+      if (saque_deposito == 0) {
+        printf("Não é possível depositar R$ 0.00 na conta\n");
+        sleep(1);
+        opcao = 0;
+      } else {
+        printf("Preparando para realizar o deposito...\n");
+        sleep(2);
+        rewind(f);
+        FILE *tmp_file = fopen("agency_copy.tbd", "w");
+        char c;
+        bool passou = false;
+        int tmp_count = 0;
+        c = getc(f);
+        while (c != EOF) {
+          if (c == '\n') {
+            tmp_count++;
+            passou = false;
+          }
+          if (tmp_count != indice) {
+            if (!passou) {
+              putc(c, tmp_file);
+            }
+          } else {
+            if (c == '\n') {
+              putc(c, tmp_file);
+            }
+            fprintf(tmp_file, "%d %d %s %s %d %.2lf %d",
+                    (conta + indice)->codigo_cliente,
+                    (conta + indice)->agencia_num,
+                    (conta + indice)->nome_cliente,
+                    (conta + indice)->sobrenome_cliente,
+                    (conta + indice)->conta_corrente,
+                    (conta + indice)->saldo_atual + saque_deposito,
+                    (conta + indice)->chave_pix);
+            tmp_count++;
+            passou = true;
+          }
+          c = getc(f);
+        }
+        fclose(f);
+        fclose(tmp_file);
+        remove(file_name);
+        rename("agency_copy.tbd", file_name);
+        opcao = 0;
+      }
       break;
     case 3:
       break;
@@ -141,6 +190,7 @@ int main(int argc, char *argv[]) {
   struct Cliente *clientes;
   clientes = (struct Cliente *)malloc(10 * sizeof(struct Cliente));
   bool conta_encontrada = false;
+  char nome_agencia[8];
   int agencia = 0, num_clientes, iterador_cod = 1, line_break, linhas_dbo = 0,
       menu_gerente = 0, sub_menu, indice_movimentacao_conta = 0;
   FILE *arquivo_agencia;
@@ -153,19 +203,23 @@ int main(int argc, char *argv[]) {
     switch (agencia) {
     case 123:
       printf("Você escolheu a agência de Mogi Guaçu (123)");
-      arquivo_agencia = fopen("123.txt", "a+");
+      strcpy(nome_agencia, "123.tbd");
+      arquivo_agencia = fopen(nome_agencia, "a+");
       break;
     case 125:
       printf("Você escolheu a agência de Mogi Mirim (125)");
-      arquivo_agencia = fopen("125.txt", "a+");
+      strcpy(nome_agencia, "125.tbd");
+      arquivo_agencia = fopen(nome_agencia, "a+");
       break;
     case 129:
       printf("Você escolheu a agência de Itapira (129)");
-      arquivo_agencia = fopen("129.txt", "a+");
+      strcpy(nome_agencia, "129.tbd");
+      arquivo_agencia = fopen(nome_agencia, "a+");
       break;
     case 130:
       printf("Você escolheu a agência de Estiva Gerbi (130)");
-      arquivo_agencia = fopen("130.txt", "a+");
+      strcpy(nome_agencia, "130.tbd");
+      arquivo_agencia = fopen(nome_agencia, "a+");
       break;
     default:
       printf("Você não selecionou nenhuma agência existente!\nPor favor, "
@@ -227,7 +281,7 @@ int main(int argc, char *argv[]) {
       } else {
         sleep(2);
         sub_menu = movimentacaoConta(clientes, indice_movimentacao_conta,
-                                     arquivo_agencia);
+                                     arquivo_agencia, nome_agencia);
         if (sub_menu == 1) {
           menu_gerente = 0;
           sub_menu = 0;
