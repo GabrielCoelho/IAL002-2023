@@ -65,7 +65,8 @@ int movimentacaoConta(struct Cliente *conta, int indice, FILE *f,
          "-------------- no sistema --------------\n");
   printf("----------------------------------------\n\n\n");
   printf("----------------------------------------\n\n\n");
-  int opcao = 0;
+  int opcao = 0, inf_agencia, inf_num_conta, indice_movimentacao_conta;
+  bool conta_encontrada;
   double saque_deposito;
   while (opcao == 0) {
     printf("Selecione a partir do menu abaixo: \n1. Saque\t2. Depósito\n3. "
@@ -173,8 +174,63 @@ int movimentacaoConta(struct Cliente *conta, int indice, FILE *f,
       printf("O Banco do Batata agradece a utilização!\n\t\t Volte sempre!");
       break;
     case 3:
+      // Pix
       break;
     case 4:
+      // Transferência
+      printf("Informe-nos a agência na qual a conta está cadastrada: ");
+      scanf("%d", &inf_agencia);
+      switch (inf_agencia) {
+      case 123:
+        printf("Agora, por favor, nos informe o número da conta: ");
+        scanf("%d", &inf_num_conta);
+        if (inf_num_conta == (conta + indice)->conta_corrente) {
+          printf("Você não pode transferir para a sua própria conta\n");
+          sleep(1);
+          opcao = 0;
+        } else {
+          for (int i = 0; i < 10; i++) {
+            if (inf_num_conta == (conta + i)->conta_corrente) {
+              printf(
+                  "A conta desejada consta em nosso banco de dados\nVocê será "
+                  "direcionado para a movimentação da mesma em breve\n\n");
+              conta_encontrada = true;
+              indice_movimentacao_conta = i;
+            }
+          }
+          if (conta_encontrada) {
+            printf("Digite a quantidade que deseja transferir: ");
+            scanf("%lf", &saque_deposito);
+            if (saque_deposito == 0) {
+              printf("Não é possível depositar R$ 0.00 na conta\n");
+              sleep(1);
+              opcao = 0;
+            } else if (saque_deposito >=
+                       (conta + indice)->saldo_atual - 21.50) {
+              printf("Você não tem limite suficiente para fazer essa "
+                     "transferência\nCusto da transferência: R$21.50\n\n");
+              sleep(1);
+              opcao = 0;
+            }
+          } else {
+            printf("Não encontramos a conta informada nesta agência!\n\nPor "
+                   "favor, certifique-se de que ela existe\n");
+            sleep(1);
+            opcao = 0;
+          }
+        }
+        break;
+      case 125:
+        break;
+      case 129:
+        break;
+      case 130:
+        break;
+      default:
+        printf("Agência não encontrada!\n\n");
+        opcao = 0;
+        break;
+      }
       break;
     case 9:
       return 1;
