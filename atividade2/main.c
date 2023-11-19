@@ -69,7 +69,7 @@ int movimentacaoConta(struct Cliente *conta, int indice, FILE *f,
   double saque_deposito;
   while (opcao == 0) {
     printf("Selecione a partir do menu abaixo: \n1. Saque\t2. Depósito\n3. "
-           "Pix\t4. Transferência\n\n");
+           "Pix\t\t4. Transferência\n9. Voltar ao menu gerencial\n");
     scanf("%d", &opcao);
     switch (opcao) {
     case 1:
@@ -176,9 +176,9 @@ int movimentacaoConta(struct Cliente *conta, int indice, FILE *f,
       break;
     case 4:
       break;
-    // case 9:
-    // return 1;
-    // break;
+    case 9:
+      return 1;
+      break;
     default:
       printf("Por favor, selecione um item existente no menu");
       opcao = 0;
@@ -293,10 +293,10 @@ int main(int argc, char *argv[]) {
           sleep(2);
           sub_menu = movimentacaoConta(clientes, indice_movimentacao_conta,
                                        arquivo_agencia, nome_agencia);
-          // if (sub_menu == 1) {
-          //   menu_gerente = 0;
-          //   sub_menu = 0;
-          // }
+          if (sub_menu == 1) {
+            menu_gerente = 0;
+            sub_menu = 0;
+          }
         }
         break;
       case 2:
