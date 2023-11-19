@@ -9,7 +9,7 @@
  */
 int exibeMenuGerente() {
   system("clear");
-  printf("----------------------------------------\n");
+  printf("\n----------------------------------------\n");
   printf("-------- Menu Gerencial do Banco -------\n");
   printf("----------------------------------------\n\n\n");
   printf("Movimentação de conta\t\tAbrir nova Conta\t\tExibir Saldo\n   - "
@@ -57,12 +57,19 @@ int movimentacaoConta(struct Cliente *conta, int indice, FILE *f,
          (conta + indice)->conta_corrente);
   printf("--------- Cliente %s %s   \n", (conta + indice)->nome_cliente,
          (conta + indice)->sobrenome_cliente);
+  printf("----------------------------------------\n");
+  printf("----------------------------------------\n");
+  printf("------ Por questões de Segurança, ------\n"
+         "------ após qualquer movimentação ------\n"
+         "------ o Gerente precisará relogar -----\n"
+         "-------------- no sistema --------------\n");
+  printf("----------------------------------------\n\n\n");
   printf("----------------------------------------\n\n\n");
   int opcao = 0;
   double saque_deposito;
   while (opcao == 0) {
-    printf("Selecione a partir do menu abaixo: \n1. Saque\t2. Depósito\t3. "
-           "Pix\t4. Transferência\n9. Voltar ao menu principal\n");
+    printf("Selecione a partir do menu abaixo: \n1. Saque\t2. Depósito\n3. "
+           "Pix\t4. Transferência\n\n");
     scanf("%d", &opcao);
     switch (opcao) {
     case 1:
@@ -113,8 +120,8 @@ int movimentacaoConta(struct Cliente *conta, int indice, FILE *f,
         fclose(tmp_file);
         remove(file_name);
         rename("agency_copy.tbd", file_name);
-        opcao = 0;
       }
+      printf("O Banco do Batata agradece a utilização!\n\t\t Volte sempre!");
       break;
     case 2:
       printf("Digite a quantidade que deseja depositar: ");
@@ -162,16 +169,16 @@ int movimentacaoConta(struct Cliente *conta, int indice, FILE *f,
         fclose(tmp_file);
         remove(file_name);
         rename("agency_copy.tbd", file_name);
-        opcao = 0;
       }
+      printf("O Banco do Batata agradece a utilização!\n\t\t Volte sempre!");
       break;
     case 3:
       break;
     case 4:
       break;
-    case 9:
-      return 1;
-      break;
+    // case 9:
+    // return 1;
+    // break;
     default:
       printf("Por favor, selecione um item existente no menu");
       opcao = 0;
@@ -286,10 +293,10 @@ int main(int argc, char *argv[]) {
           sleep(2);
           sub_menu = movimentacaoConta(clientes, indice_movimentacao_conta,
                                        arquivo_agencia, nome_agencia);
-          if (sub_menu == 1) {
-            menu_gerente = 0;
-            sub_menu = 0;
-          }
+          // if (sub_menu == 1) {
+          //   menu_gerente = 0;
+          //   sub_menu = 0;
+          // }
         }
         break;
       case 2:
