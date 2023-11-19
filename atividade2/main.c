@@ -24,7 +24,8 @@ int inicioBanco() {
   printf("------ Banco do Batata - v1.0.0 --------\n");
   printf("----------------------------------------\n\n\n");
   printf("Agências em toda a região da Baixa Mogiana \n123 - Mogi Guaçu\t125 "
-         "- Mogi Mirim\t129 - Itapira\t130 - Estiva Gerbi\n");
+         "- Mogi Mirim\n129 - Itapira\t130 - Estiva Gerbi\n9 - Para sair do "
+         "programa\n");
   return 0;
 }
 
@@ -37,6 +38,15 @@ struct Cliente {
   double saldo_atual;
   int chave_pix; // numero da agencia + codigo_cliente
 };
+
+void atualizaClientes(struct Cliente *c, int max_line, FILE *f) {
+  for (int i = 0; i < max_line; i++) {
+    fscanf(f, "%d %d %s %s %d %lf %d", &(c + i)->codigo_cliente,
+           &(c + i)->agencia_num, (c + i)->nome_cliente,
+           (c + i)->sobrenome_cliente, &(c + i)->conta_corrente,
+           &(c + i)->saldo_atual, &(c + i)->chave_pix);
+  }
+}
 
 int movimentacaoConta(struct Cliente *conta, int indice, FILE *f,
                       char *file_name) {
@@ -192,11 +202,11 @@ int main(int argc, char *argv[]) {
   bool conta_encontrada = false;
   char nome_agencia[8];
   int agencia = 0, num_clientes, iterador_cod = 1, line_break, linhas_dbo = 0,
-      menu_gerente = 0, sub_menu, indice_movimentacao_conta = 0;
+      menu_gerente, sub_menu, indice_movimentacao_conta = 0;
   FILE *arquivo_agencia;
 
-  inicioBanco();
   while (agencia == 0) {
+    inicioBanco();
     printf("\n\nDigite o número da agência que você deseja controlar: ");
     scanf("%d", &agencia);
 
@@ -221,122 +231,106 @@ int main(int argc, char *argv[]) {
       strcpy(nome_agencia, "130.tbd");
       arquivo_agencia = fopen(nome_agencia, "a+");
       break;
+    case 9:
+      printf("Saindo do programa\n\n");
+      return 0;
     default:
       printf("Você não selecionou nenhuma agência existente!\nPor favor, "
              "selecione corretamente!");
       agencia = 0;
       break;
     }
-  }
-  if (arquivo_agencia == NULL) {
-    printf("Arquivo de dados corrompido, por favor, ligue para os "
-           "desenvolvedores urgentemente:\nGabriel Coelho: 1970707070\nIan "
-           "Camargo: 1970207020\nMarcos Moreira: +9122132488\n");
-    return 0;
-  }
+    if (arquivo_agencia == NULL) {
+      printf("Arquivo de dados corrompido, por favor, ligue para os "
+             "desenvolvedores urgentemente:\nGabriel Coelho: 1970707070\nIan "
+             "Camargo: 1970207020\nMarcos Moreira: +9122132488\n");
+      return 0;
+    }
 
-  for (line_break = getc(arquivo_agencia); line_break != EOF;
-       line_break = getc(arquivo_agencia)) {
-    if (line_break == '\n')
-      linhas_dbo++;
-  }
-  num_clientes = (10 - linhas_dbo);
-  rewind(arquivo_agencia);
-  for (int i = 0; i < linhas_dbo; i++) {
-    fscanf(arquivo_agencia, "%d %d %s %s %d %lf %d",
-           &(clientes + i)->codigo_cliente, &(clientes + i)->agencia_num,
-           (clientes + i)->nome_cliente, (clientes + i)->sobrenome_cliente,
-           &(clientes + i)->conta_corrente, &(clientes + i)->saldo_atual,
-           &(clientes + i)->chave_pix);
-  }
-  printf("\n\n Agência %d\nNúmero de Clientes cadastrados %d/10\nNúmero de "
-         "vagas %d/10",
-         agencia, linhas_dbo, num_clientes);
-  while (menu_gerente == 0) {
-    exibeMenuGerente();
-    printf("Escolha uma opção:\n1. Movimentar uma Conta\n2. Abrir Conta\n3. "
-           "Consultar saldo de conta\n9. Sair do programa: "); // OU voltar ao
-                                                               // menu principal
-                                                               // (de agências)
-    scanf("%d", &menu_gerente);
-    switch (menu_gerente) {
-    case 1:
-      printf("\n\nDigite o número da conta desejada: ");
-      scanf("%d", &sub_menu);
-      for (int i = 0; i < linhas_dbo; i++) {
-        if (sub_menu == (clientes + i)->conta_corrente) {
-          printf("A conta desejada consta em nosso banco de dados\nVocê será "
-                 "direcionado para a movimentação da mesma em breve\n\n");
-          conta_encontrada = true;
-          indice_movimentacao_conta = i;
+    for (line_break = getc(arquivo_agencia); line_break != EOF;
+         line_break = getc(arquivo_agencia)) {
+      if (line_break == '\n')
+        linhas_dbo++;
+    }
+    num_clientes = (10 - linhas_dbo);
+    rewind(arquivo_agencia);
+    atualizaClientes(clientes, linhas_dbo, arquivo_agencia);
+    menu_gerente = 0;
+    sub_menu = 0;
+    while (menu_gerente == 0) {
+      exibeMenuGerente();
+      printf("Escolha uma opção:\n1. Movimentar uma Conta\n2. Abrir Conta\n3. "
+             "Consultar saldo de conta\n9. Escolher outra agência: ");
+      scanf("%d", &menu_gerente);
+      switch (menu_gerente) {
+      case 1:
+        printf("\n\nDigite o número da conta desejada: ");
+        scanf("%d", &sub_menu);
+        for (int i = 0; i < linhas_dbo; i++) {
+          if (sub_menu == (clientes + i)->conta_corrente) {
+            printf("A conta desejada consta em nosso banco de dados\nVocê será "
+                   "direcionado para a movimentação da mesma em breve\n\n");
+            conta_encontrada = true;
+            indice_movimentacao_conta = i;
+          }
         }
-      }
-      if (!conta_encontrada) {
-        printf("A conta digitada não foi encontrada, certifique-se de que o "
-               "cliente informou a conta certa\nAguarde enquanto retornamos ao "
-               "menu de gerência...\n\n");
-        sleep(5);
-        sub_menu = 0;
-        menu_gerente = 0;
-      } else {
-        sleep(2);
-        sub_menu = movimentacaoConta(clientes, indice_movimentacao_conta,
-                                     arquivo_agencia, nome_agencia);
-        if (sub_menu == 1) {
+        if (!conta_encontrada) {
+          printf(
+              "A conta digitada não foi encontrada, certifique-se de que o "
+              "cliente informou a conta certa\nAguarde enquanto retornamos ao "
+              "menu de gerência...\n\n");
+          sleep(5);
+          sub_menu = 0;
+          menu_gerente = 0;
+        } else {
+          sleep(2);
+          sub_menu = movimentacaoConta(clientes, indice_movimentacao_conta,
+                                       arquivo_agencia, nome_agencia);
+          if (sub_menu == 1) {
+            menu_gerente = 0;
+            sub_menu = 0;
+          }
+        }
+        break;
+      case 2:
+        break;
+      case 3:
+        printf("\n\nDigite o número da conta desejada: ");
+        scanf("%d", &sub_menu);
+        for (int i = 0; i < linhas_dbo; i++) {
+          if (sub_menu == (clientes + i)->conta_corrente) {
+            printf("A conta desejada consta em nosso banco de dados\nVocê será "
+                   "direcionado para a movimentação da mesma em breve\n\n");
+            conta_encontrada = true;
+            indice_movimentacao_conta = i;
+          }
+        }
+        if (!conta_encontrada) {
+          printf(
+              "A conta digitada não foi encontrada, certifique-se de que o "
+              "cliente informou a conta certa\nAguarde enquanto retornamos ao "
+              "menu de gerência...\n\n");
+          sleep(5);
+          sub_menu = 0;
+          menu_gerente = 0;
+        } else {
+          rewind(arquivo_agencia);
+          atualizaClientes(clientes, linhas_dbo, arquivo_agencia);
+          sleep(2);
+          exibeSaldoConta(clientes, indice_movimentacao_conta);
           menu_gerente = 0;
           sub_menu = 0;
         }
-      }
-      break;
-    case 2:
-      break;
-    case 3:
-      printf("\n\nDigite o número da conta desejada: ");
-      scanf("%d", &sub_menu);
-      for (int i = 0; i < linhas_dbo; i++) {
-        if (sub_menu == (clientes + i)->conta_corrente) {
-          printf("A conta desejada consta em nosso banco de dados\nVocê será "
-                 "direcionado para a movimentação da mesma em breve\n\n");
-          conta_encontrada = true;
-          indice_movimentacao_conta = i;
-        }
-      }
-      if (!conta_encontrada) {
-        printf("A conta digitada não foi encontrada, certifique-se de que o "
-               "cliente informou a conta certa\nAguarde enquanto retornamos ao "
-               "menu de gerência...\n\n");
-        sleep(5);
-        sub_menu = 0;
+        break;
+      case 9:
+        agencia = 0;
+        break;
+      default:
+        printf("Opção Inexistente\n\n");
         menu_gerente = 0;
-      } else {
-        sleep(2);
-        exibeSaldoConta(clientes, indice_movimentacao_conta);
-        menu_gerente = 0;
-        sub_menu = 0;
+        break;
       }
-      break;
-    case 9:
-      printf("Saindo do programa\n\n");
-      return 0;
-    default:
-      printf("Opção Inexistente\n\n");
-      menu_gerente = 0;
-      break;
     }
   }
-
-  // printf("Digite a quantidade de clientes cadastrados nessa agência: ");
-  // scanf("%d", &num_clientes);
-  // // Alocando um espaço de memória de acordo com o número de clientes
-  // clientes = (struct Cliente *)malloc(num_clientes * sizeof(struct Cliente));
-  //
-  // printf("Cadastro de Cliente número");
-  // for (iterador_cod; iterador_cod <= num_clientes; iterador_cod++) {
-  //   printf("Digite o nome do cliente e em seguida o número da conta corrente
-  //   "
-  //          "com o dígito: ");
-  //   scanf("%s %s", &(clientes + (iterador_cod - 1))->nome_cliente,
-  //         &(clientes + (iterador_cod - 1))->conta_corrente);
-  // }
   return EXIT_SUCCESS;
 }
