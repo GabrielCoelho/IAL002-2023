@@ -40,6 +40,8 @@ struct Cliente {
 };
 
 void atualizaClientes(struct Cliente *c, int max_line, FILE *f) {
+  c = (struct Cliente *)malloc(10 * sizeof(struct Cliente));
+  rewind(f);
   for (int i = 0; i < max_line; i++) {
     fscanf(f, "%d %d %s %s %d %lf %d", &(c + i)->codigo_cliente,
            &(c + i)->agencia_num, (c + i)->nome_cliente,
@@ -59,12 +61,8 @@ int movimentacaoConta(struct Cliente *conta, int indice, FILE *f,
          (conta + indice)->sobrenome_cliente);
   printf("----------------------------------------\n");
   printf("----------------------------------------\n");
-  printf("------ Por questões de Segurança, ------\n"
-         "------ após qualquer movimentação ------\n"
-         "------ o Gerente precisará relogar -----\n"
-         "-------------- no sistema --------------\n");
   printf("----------------------------------------\n\n\n");
-  printf("----------------------------------------\n\n\n");
+  char transf_agencia[8];
   int opcao = 0, inf_agencia, inf_num_conta, indice_movimentacao_conta;
   bool conta_encontrada;
   double saque_deposito;
@@ -121,8 +119,9 @@ int movimentacaoConta(struct Cliente *conta, int indice, FILE *f,
         fclose(tmp_file);
         remove(file_name);
         rename("agency_copy.tbd", file_name);
+        opcao = 0;
+        f = fopen(file_name, "a+");
       }
-      printf("O Banco do Batata agradece a utilização!\n\t\t Volte sempre!");
       break;
     case 2:
       printf("Digite a quantidade que deseja depositar: ");
@@ -170,8 +169,11 @@ int movimentacaoConta(struct Cliente *conta, int indice, FILE *f,
         fclose(tmp_file);
         remove(file_name);
         rename("agency_copy.tbd", file_name);
+        f = fopen(file_name, "a+");
+        opcao = 0;
+        free(conta);
+        atualizaClientes(conta, 10, f);
       }
-      printf("O Banco do Batata agradece a utilização!\n\t\t Volte sempre!");
       break;
     case 3:
       // Pix
@@ -182,6 +184,7 @@ int movimentacaoConta(struct Cliente *conta, int indice, FILE *f,
       scanf("%d", &inf_agencia);
       switch (inf_agencia) {
       case 123:
+        strcpy(transf_agencia, "123.tbd");
         printf("Agora, por favor, nos informe o número da conta: ");
         scanf("%d", &inf_num_conta);
         if (inf_num_conta == (conta + indice)->conta_corrente) {
@@ -211,6 +214,83 @@ int movimentacaoConta(struct Cliente *conta, int indice, FILE *f,
                      "transferência\nCusto da transferência: R$21.50\n\n");
               sleep(1);
               opcao = 0;
+            } else {
+              // Retira o dinheiro da primeira conta
+              rewind(f);
+              FILE *tmp_file = fopen("agency_copy.tbd", "w");
+              char c;
+              bool passou = false;
+              int tmp_count = 0;
+              c = getc(f);
+              while (c != EOF) {
+                if (c == '\n') {
+                  tmp_count++;
+                  passou = false;
+                }
+                if (tmp_count != indice) {
+                  if (!passou) {
+                    putc(c, tmp_file);
+                  }
+                } else {
+                  if (c == '\n') {
+                    putc(c, tmp_file);
+                  }
+                  fprintf(tmp_file, "%d %d %s %s %d %.2lf %d",
+                          (conta + indice)->codigo_cliente,
+                          (conta + indice)->agencia_num,
+                          (conta + indice)->nome_cliente,
+                          (conta + indice)->sobrenome_cliente,
+                          (conta + indice)->conta_corrente,
+                          (conta + indice)->saldo_atual - saque_deposito -
+                              21.50,
+                          (conta + indice)->chave_pix);
+                  tmp_count++;
+                  passou = true;
+                }
+                c = getc(f);
+              }
+              fclose(f);
+              fclose(tmp_file);
+              remove(file_name);
+              rename("agency_copy.tbd", file_name);
+              // insere o dinheiro na nova conta
+              tmp_file = fopen("agency_copy.tbd", "w");
+              FILE *tmp_file2 = fopen(transf_agencia, "a+");
+              c = getc(tmp_file2);
+              while (c != EOF) {
+                if (c == '\n') {
+                  tmp_count++;
+                  passou = false;
+                }
+                if (tmp_count != indice_movimentacao_conta) {
+                  if (!passou) {
+                    putc(c, tmp_file);
+                  }
+                } else {
+                  if (c == '\n') {
+                    putc(c, tmp_file);
+                  }
+                  fprintf(
+                      tmp_file, "%d %d %s %s %d %.2lf %d",
+                      (conta + indice_movimentacao_conta)->codigo_cliente,
+                      (conta + indice_movimentacao_conta)->agencia_num,
+                      (conta + indice_movimentacao_conta)->nome_cliente,
+                      (conta + indice_movimentacao_conta)->sobrenome_cliente,
+                      (conta + indice_movimentacao_conta)->conta_corrente,
+                      (conta + indice_movimentacao_conta)->saldo_atual +
+                          saque_deposito,
+                      (conta + indice_movimentacao_conta)->chave_pix);
+                  tmp_count++;
+                  passou = true;
+                }
+                c = getc(f);
+              }
+              fclose(tmp_file2);
+              fclose(tmp_file);
+              remove(transf_agencia);
+              rename("agency_copy.tbd", transf_agencia);
+              printf("Transferência executada com sucesso.\n\nSaindo do "
+                     "Programa...\n");
             }
           } else {
             printf("Não encontramos a conta informada nesta agência!\n\nPor "
@@ -272,7 +352,6 @@ int main(int argc, char *argv[]) {
     inicioBanco();
     printf("\n\nDigite o número da agência que você deseja controlar: ");
     scanf("%d", &agencia);
-
     switch (agencia) {
     case 123:
       printf("Você escolheu a agência de Mogi Guaçu (123)");
@@ -309,7 +388,6 @@ int main(int argc, char *argv[]) {
              "Camargo: 1970207020\nMarcos Moreira: +9122132488\n");
       return 0;
     }
-
     for (line_break = getc(arquivo_agencia); line_break != EOF;
          line_break = getc(arquivo_agencia)) {
       if (line_break == '\n')
@@ -377,8 +455,6 @@ int main(int argc, char *argv[]) {
           sub_menu = 0;
           menu_gerente = 0;
         } else {
-          rewind(arquivo_agencia);
-          atualizaClientes(clientes, linhas_dbo, arquivo_agencia);
           sleep(2);
           exibeSaldoConta(clientes, indice_movimentacao_conta);
           menu_gerente = 0;
