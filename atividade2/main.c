@@ -40,7 +40,7 @@ struct Cliente {
 };
 
 void atualizaClientes(struct Cliente *c, int max_line, FILE *f) {
-  c = (struct Cliente *)malloc(10 * sizeof(struct Cliente));
+  // c = (struct Cliente *)malloc(10 * sizeof(struct Cliente));
   rewind(f);
   for (int i = 0; i < max_line; i++) {
     fscanf(f, "%d %d %s %s %d %lf %d", &(c + i)->codigo_cliente,
@@ -48,10 +48,11 @@ void atualizaClientes(struct Cliente *c, int max_line, FILE *f) {
            (c + i)->sobrenome_cliente, &(c + i)->conta_corrente,
            &(c + i)->saldo_atual, &(c + i)->chave_pix);
   }
+  // free(c);
 }
 
-int movimentacaoConta(struct Cliente *conta, int indice, FILE *f,
-                      char *file_name) {
+int movimentacaoConta(struct Cliente *conta, int indice,
+                      int clientes_cadastrados, FILE *f, char *file_name) {
   system("clear");
   printf("----------------------------------------\n");
   printf("--------- Movimentação da Conta: -------\n");
@@ -121,6 +122,7 @@ int movimentacaoConta(struct Cliente *conta, int indice, FILE *f,
         rename("agency_copy.tbd", file_name);
         opcao = 0;
         f = fopen(file_name, "a+");
+        atualizaClientes(conta, clientes_cadastrados, f);
       }
       break;
     case 2:
@@ -171,8 +173,7 @@ int movimentacaoConta(struct Cliente *conta, int indice, FILE *f,
         rename("agency_copy.tbd", file_name);
         f = fopen(file_name, "a+");
         opcao = 0;
-        free(conta);
-        atualizaClientes(conta, 10, f);
+        atualizaClientes(conta, clientes_cadastrados, f);
       }
       break;
     case 3:
@@ -425,8 +426,9 @@ int main(int argc, char *argv[]) {
           menu_gerente = 0;
         } else {
           sleep(2);
-          sub_menu = movimentacaoConta(clientes, indice_movimentacao_conta,
-                                       arquivo_agencia, nome_agencia);
+          sub_menu =
+              movimentacaoConta(clientes, indice_movimentacao_conta, linhas_dbo,
+                                arquivo_agencia, nome_agencia);
           if (sub_menu == 1) {
             menu_gerente = 0;
             sub_menu = 0;
