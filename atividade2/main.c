@@ -284,14 +284,14 @@ int movimentacaoConta(struct Cliente *conta, int indice,
                   tmp_count++;
                   passou = true;
                 }
-                c = getc(f);
+                c = getc(tmp_file2);
               }
               fclose(tmp_file2);
               fclose(tmp_file);
               remove(transf_agencia);
               rename("agency_copy.tbd", transf_agencia);
-              printf("Transferência executada com sucesso.\n\nSaindo do "
-                     "Programa...\n");
+              printf("Transferência executada com sucesso.\n\n");
+              opcao = 0;
             }
           } else {
             printf("Não encontramos a conta informada nesta agência!\n\nPor "
