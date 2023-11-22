@@ -97,7 +97,7 @@ int saque_deposito_conta(int operacao, Cliente *c, int indice_da_conta,
     strcpy(mensagem_operacao, "depósito");
   }
 
-  printf("Digite a quantidade que deseja %s: ", mensagem);
+  printf("Digite a quantidade que deseja %s: ", mensagem_inicio);
   scanf("%lf", &valor_saque_dep);
   if (valor_saque_dep > (c + indice_da_conta)->saldo_atual) {
     printf("Quantia desejada maior que saldo disponível, por favor, "
@@ -107,30 +107,30 @@ int saque_deposito_conta(int operacao, Cliente *c, int indice_da_conta,
     return saque_deposito_conta(operacao, c, indice_da_conta, file_agencia,
                                 nome_do_arquivo);
   } else {
-    printf("Preparando para realizar o saque...\n\n");
+    printf("Preparando para realizar o %s...\n\n", mensagem_operacao);
     sleep(2);
     rewind(file_agencia);
     FILE *tmp_file = fopen(tmp_file_agencia_name, "w");
-    char c;
+    char x;
     bool passou = false;
     int tmp_count = 0;
-    c = getc(file_agencia);
-    while (c != EOF) {
-      if (c == '\n') {
+    x = getc(file_agencia);
+    while (x != EOF) {
+      if (x == '\n') {
         tmp_count++;
         passou = false;
       }
       if (tmp_count != indice_da_conta) {
         if (!passou) {
-          putc(c, tmp_file);
+          putc(x, tmp_file);
         }
       } else {
-        if (c == '\n') {
-          putc(c, tmp_file);
+        if (x == '\n') {
+          putc(x, tmp_file);
         }
         fprintf(tmp_file, "%d %d %s %s %d %.2lf %d",
                 (c + indice_da_conta)->codigo_cliente,
-                (conta + indice)->agencia_num,
+                (c + indice_da_conta)->agencia_num,
                 (c + indice_da_conta)->nome_cliente,
                 (c + indice_da_conta)->sobrenome_cliente,
                 (c + indice_da_conta)->conta_corrente,
@@ -141,14 +141,13 @@ int saque_deposito_conta(int operacao, Cliente *c, int indice_da_conta,
         tmp_count++;
         passou = true;
       }
-      c = getc(file_agencia);
+      x = getc(file_agencia);
     }
     fclose(file_agencia);
     fclose(tmp_file);
     remove(nome_do_arquivo);
     rename(tmp_file_agencia_name, nome_do_arquivo);
     file_agencia = fopen(nome_do_arquivo, "a+");
-    atualizaClientes(c, 10, file_agencia);
     return 0;
   }
 }
@@ -175,10 +174,12 @@ int movimentar_conta(Cliente *c, int indice_da_conta, int tamanho_agencia,
     case 1:
     case 2:
       saque_deposito_conta(opcao, c, indice_da_conta);
+      atualizaClientes(c, 10, file_agencia);
       break;
     case 3:
       break;
     case 4:
+      transferencia_entre_contas();
       break;
     case 9:
       printf("Retornando ao menu gerencial");
