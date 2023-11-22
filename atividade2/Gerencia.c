@@ -9,12 +9,12 @@ int exibe_inicio_banco() {
   int recebe_agencia;
   system("clear");
   printf("----------------------------------------\n");
-  printf("------ Banco do Batata - v1.0.0 --------\n");
+  printf("------ Banco do Batata - v1.1.9 --------\n");
   printf("----------------------------------------\n\n\n");
   printf("Agências em toda a região da Baixa Mogiana \n123 - Mogi Guaçu\t125 "
          "- Mogi Mirim\n129 - Itapira\t130 - Estiva Gerbi\n9 - Para sair do "
          "programa\n");
-  printf("\n\nDigite o número da agência que você deseja controlar: ");
+  printf("\n\nDigite qualquer número de agência para entrar no sistema: ");
   scanf("%d", &recebe_agencia);
   return recebe_agencia;
 }
@@ -170,52 +170,68 @@ int transferencia_entre_contas(Cliente *c, int indice_da_conta,
                                       nome_do_arquivo);
   } else {
     printf("Informe a conta que receberá este valor: ");
-    scanf("%d", conta_destino);
-    bool conta_destino_existe = false;
+    scanf("%d", &conta_destino);
     int indice_conta_destino;
     indice_conta_destino = encontrar_conta(c, conta_destino, 10);
-    printf("Preparando para realizar a transferência...\n\n");
-    sleep(2);
-    rewind(file_agencia);
-    FILE *tmp_file = fopen(tmp_file_agencia_name, "w");
-    char x;
-    bool passou = false;
-    int tmp_count = 0;
-    x = getc(file_agencia);
-    while (x != EOF) {
-      if (x == '\n') {
-        tmp_count++;
-        passou = false;
-      }
-      if (tmp_count != indice_da_conta) {
-        if (!passou) {
-          putc(x, tmp_file);
-        }
-      } else {
-        if (x == '\n') {
-          putc(x, tmp_file);
-        }
-        fprintf(tmp_file, "%d %d %s %s %d %.2lf %d",
-                (c + indice_da_conta)->codigo_cliente,
-                (c + indice_da_conta)->agencia_num,
-                (c + indice_da_conta)->nome_cliente,
-                (c + indice_da_conta)->sobrenome_cliente,
-                (c + indice_da_conta)->conta_corrente,
-                (c + indice_da_conta)->saldo_atual - valor_transferencia -
-                    22.50,
-                (c + indice_da_conta)->chave_pix);
-        tmp_count++;
-        passou = true;
-      }
+    if (indice_conta_destino == 20) {
+      printf("A conta informada não existe! \nRetornando ao menu gerencial");
+      return 0;
+    } else {
+      printf("Preparando para realizar a transferência...\n\n");
+      sleep(2);
+      rewind(file_agencia);
+      FILE *tmp_file = fopen(tmp_file_agencia_name, "w");
+      char x;
+      bool passou = false;
+      int tmp_count = 0;
       x = getc(file_agencia);
+      while (x != EOF) {
+        if (x == '\n') {
+          tmp_count++;
+          passou = false;
+        }
+        if (tmp_count != indice_da_conta) {
+          if (!passou) {
+            putc(x, tmp_file);
+          }
+        } else if (tmp_count == indice_da_conta) {
+          if (x == '\n') {
+            putc(x, tmp_file);
+          }
+          fprintf(tmp_file, "%d %d %s %s %d %.2lf %d",
+                  (c + indice_da_conta)->codigo_cliente,
+                  (c + indice_da_conta)->agencia_num,
+                  (c + indice_da_conta)->nome_cliente,
+                  (c + indice_da_conta)->sobrenome_cliente,
+                  (c + indice_da_conta)->conta_corrente,
+                  (c + indice_da_conta)->saldo_atual - valor_transferencia -
+                      22.50,
+                  (c + indice_da_conta)->chave_pix);
+          tmp_count++;
+          passou = true;
+        } else if (tmp_count == indice_conta_destino) {
+          if (x == '\n') {
+            putc(x, tmp_file);
+          }
+          fprintf(tmp_file, "%d %d %s %s %d %.2lf %d",
+                  (c + indice_conta_destino)->codigo_cliente,
+                  (c + indice_conta_destino)->agencia_num,
+                  (c + indice_conta_destino)->nome_cliente,
+                  (c + indice_conta_destino)->sobrenome_cliente,
+                  (c + indice_conta_destino)->conta_corrente,
+                  (c + indice_conta_destino)->saldo_atual + valor_transferencia,
+                  (c + indice_conta_destino)->chave_pix);
+          tmp_count++;
+          passou = true;
+        }
+        x = getc(file_agencia);
+      }
+      fclose(file_agencia);
+      fclose(tmp_file);
+      remove(nome_do_arquivo);
+      rename(tmp_file_agencia_name, nome_do_arquivo);
+      file_agencia = fopen(nome_do_arquivo, "a+");
     }
-    fclose(file_agencia);
-    fclose(tmp_file);
-    remove(nome_do_arquivo);
-    rename(tmp_file_agencia_name, nome_do_arquivo);
-    file_agencia = fopen(nome_do_arquivo, "a+");
-    tmp_file = fopen(tmp_file_agencia_name, "w");
-
     return 0;
   }
 }
