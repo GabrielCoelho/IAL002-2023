@@ -40,7 +40,7 @@ struct Cliente {
 };
 
 void atualizaClientes(struct Cliente *c, int max_line, FILE *f) {
-  // c = (struct Cliente *)malloc(10 * sizeof(struct Cliente));
+  c = (struct Cliente *)malloc(sizeof(struct Cliente));
   rewind(f);
   for (int i = 0; i < max_line; i++) {
     fscanf(f, "%d %d %s %s %d %lf %d", &(c + i)->codigo_cliente,
@@ -48,7 +48,7 @@ void atualizaClientes(struct Cliente *c, int max_line, FILE *f) {
            (c + i)->sobrenome_cliente, &(c + i)->conta_corrente,
            &(c + i)->saldo_atual, &(c + i)->chave_pix);
   }
-  // free(c);
+  free(c);
 }
 
 int movimentacaoConta(struct Cliente *conta, int indice,
@@ -341,14 +341,12 @@ double exibeSaldoConta(struct Cliente *conta, int indice) {
 }
 
 int main(int argc, char *argv[]) {
-  struct Cliente *clientes;
-  clientes = (struct Cliente *)malloc(10 * sizeof(struct Cliente));
+  struct Cliente clientes[10];
   bool conta_encontrada = false;
   char nome_agencia[8];
   int agencia = 0, num_clientes, iterador_cod = 1, line_break, linhas_dbo = 0,
       menu_gerente, sub_menu, indice_movimentacao_conta = 0;
   FILE *arquivo_agencia;
-
   while (agencia == 0) {
     inicioBanco();
     printf("\n\nDigite o número da agência que você deseja controlar: ");
