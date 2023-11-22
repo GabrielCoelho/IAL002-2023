@@ -260,10 +260,14 @@ int movimentar_conta(Cliente *c, int indice_da_conta, int tamanho_agencia,
       saque_deposito_conta(opcao, c, indice_da_conta, file_agencia,
                            nome_do_arquivo);
       atualiza_clientes(c, 10, file_agencia);
+      opcao = 0;
       break;
     case 3:
       break;
     case 4:
+      transferencia_entre_contas(c, indice_da_conta, file_agencia,
+                                 nome_do_arquivo);
+      opcao = 0;
       break;
     case 9:
       printf("Retornando ao menu gerencial");
