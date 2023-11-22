@@ -18,21 +18,8 @@ int main(int argc, char *argv[]) {
     case 130:
       printf("Você está prestes a entrar no banco. Por favor, aguarde... \n\n");
       sleep(3);
-      while (resp_menu_gerente == 0) {
-        resp_menu_gerente = exibe_menu_gerente();
-        switch (resp_menu_gerente) {
-        case 1:
-          break;
-        case 2:
-          break;
-        case 3:
-          break;
-        case 9:
-          break;
-        default:
-          break;
-        }
-      }
+      resp_menu_gerente = exibe_menu_gerente();
+      senha_banco_gerencia = 0;
       break;
     case 9:
       printf("Obrigado por utilizar nosso programa!\nSaindo com segurança...");
@@ -40,7 +27,9 @@ int main(int argc, char *argv[]) {
       break;
     default:
       printf("Não temos nenhuma agência com este número.\nPara entrar no "
-             "sistema, entre com um número de nossas agências");
+             "sistema, entre com um número de nossas agências\nLevando você de "
+             "volta ao início...\n\n");
+      sleep(2);
       senha_banco_gerencia = 0;
       break;
     }

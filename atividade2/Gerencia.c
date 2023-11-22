@@ -30,7 +30,7 @@ int exibe_menu_gerente() {
          "saldo atual\n   - Depositar quantia\n   - Efetuar PIX\n   - "
          "Transferência\n\n");
   printf("Escolha um menu:\n1. Movimentar uma Conta\n2. Abrir Conta\n3. "
-         "Consultar saldo de conta\n9. Escolher outra agência: ");
+         "Consultar saldo de conta\n9. Voltar ao Início: ");
   scanf("%d", &recebe_menu);
   return recebe_menu;
 }
@@ -275,5 +275,5 @@ int movimentar_conta(Cliente *c, int indice_da_conta, int tamanho_agencia,
       return 1;
     }
   }
-  return 0;
+  return 1;
 }
