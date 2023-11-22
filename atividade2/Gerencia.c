@@ -35,27 +35,27 @@ int exibe_menu_gerente() {
   return recebe_menu;
 }
 
-void atualiza_clientes(Cliente *c, int tamanho_agencia, FILE *file_agencia) {
-  c = (Cliente *)malloc(sizeof(Cliente));
+void atualiza_clientes(Cliente **c, int tamanho_agencia, FILE *file_agencia) {
+  c = (Cliente **)malloc(sizeof(Cliente *));
   rewind(file_agencia);
   for (int i = 0; i < tamanho_agencia; i++) {
-    fscanf(file_agencia, "%d %d %s %s %d %lf %d", &(c + i)->codigo_cliente,
-           &(c + i)->agencia_num, (c + i)->nome_cliente,
-           (c + i)->sobrenome_cliente, &(c + i)->conta_corrente,
-           &(c + i)->saldo_atual, &(c + i)->chave_pix);
+    fscanf(file_agencia, "%d %d %s %s %d %lf %d", (*c + i)->codigo_cliente,
+           (*c + i)->agencia_num, (*c + i)->nome_cliente,
+           (*c + i)->sobrenome_cliente, (*c + i)->conta_corrente,
+           (*c + i)->saldo_atual, (*c + i)->chave_pix);
   }
 }
 
-void exibe_saldo(Cliente *c, int indice_da_conta) {
+void exibe_saldo(Cliente **c, int indice_da_conta) {
   system("clear");
   printf("----------------------------------------\n");
   printf("--------- Saldo da Conta: -------\n");
   printf("---- Ag: %d -------- Conta: %d ----\n",
-         (c + indice_da_conta)->agencia_num,
-         (c + indice_da_conta)->conta_corrente);
-  printf("--------- Cliente %s %s   \n", (c + indice_da_conta)->nome_cliente,
-         (c + indice_da_conta)->sobrenome_cliente);
-  printf("--------- SALDO: R$ %.2lf\n", (c + indice_da_conta)->saldo_atual);
+         (*c + indice_da_conta)->agencia_num,
+         (*c + indice_da_conta)->conta_corrente);
+  printf("--------- Cliente %s %s   \n", (*c + indice_da_conta)->nome_cliente,
+         (*c + indice_da_conta)->sobrenome_cliente);
+  printf("--------- SALDO: R$ %.2lf\n", (*c + indice_da_conta)->saldo_atual);
   printf("----------------------------------------\n\n\n");
   printf("Retornando ao menu gerencial em 5 segundos...\n\n");
   sleep(5);
@@ -72,10 +72,10 @@ int verifica_cadastrados(FILE *file_agencia) {
   return quantidade_cadastrado; // retornando a quantidade cadastrada
 }
 
-int encontrar_conta(Cliente *c, int conta_buscada, int tamanho_agencia) {
+int encontrar_conta(Cliente **c, int conta_buscada, int tamanho_agencia) {
   bool conta_encontrada = false;
   for (int i = 0; i < tamanho_agencia; i++) {
-    if (conta_buscada == (c + i)->conta_corrente) {
+    if (conta_buscada == (*c + i)->conta_corrente) {
       conta_encontrada = true;
       return i; // Retorna o indice do struct em qual a conta buscada está
                 // armazenado
@@ -83,7 +83,7 @@ int encontrar_conta(Cliente *c, int conta_buscada, int tamanho_agencia) {
   }
   return 20; // se retornar 20, é porque não foi encontrada
 }
-int saque_deposito_conta(int operacao, Cliente *c, int indice_da_conta,
+int saque_deposito_conta(int operacao, Cliente **c, int indice_da_conta,
                          FILE *file_agencia, char *nome_do_arquivo) {
   double valor_saque_dep;
   char mensagem_inicio[11], mensagem_operacao[11],
@@ -99,10 +99,10 @@ int saque_deposito_conta(int operacao, Cliente *c, int indice_da_conta,
 
   printf("Digite a quantidade que deseja %s: ", mensagem_inicio);
   scanf("%lf", &valor_saque_dep);
-  if (valor_saque_dep > (c + indice_da_conta)->saldo_atual) {
+  if (valor_saque_dep > (*c + indice_da_conta)->saldo_atual) {
     printf("Quantia desejada maior que saldo disponível, por favor, "
            "escolha um valor entre: R$0.00 - R$%.2lf\n\n",
-           (c + indice_da_conta)->saldo_atual);
+           (*c + indice_da_conta)->saldo_atual);
     sleep(1);
     return saque_deposito_conta(operacao, c, indice_da_conta, file_agencia,
                                 nome_do_arquivo);
@@ -129,15 +129,15 @@ int saque_deposito_conta(int operacao, Cliente *c, int indice_da_conta,
           putc(x, tmp_file);
         }
         fprintf(tmp_file, "%d %d %s %s %d %.2lf %d",
-                (c + indice_da_conta)->codigo_cliente,
-                (c + indice_da_conta)->agencia_num,
-                (c + indice_da_conta)->nome_cliente,
-                (c + indice_da_conta)->sobrenome_cliente,
-                (c + indice_da_conta)->conta_corrente,
+                (*c + indice_da_conta)->codigo_cliente,
+                (*c + indice_da_conta)->agencia_num,
+                (*c + indice_da_conta)->nome_cliente,
+                (*c + indice_da_conta)->sobrenome_cliente,
+                (*c + indice_da_conta)->conta_corrente,
                 operacao == 1
-                    ? (c + indice_da_conta)->saldo_atual - valor_saque_dep
-                    : (c + indice_da_conta)->saldo_atual + valor_saque_dep,
-                (c + indice_da_conta)->chave_pix);
+                    ? (*c + indice_da_conta)->saldo_atual - valor_saque_dep
+                    : (*c + indice_da_conta)->saldo_atual + valor_saque_dep,
+                (*c + indice_da_conta)->chave_pix);
         tmp_count++;
         passou = true;
       }
@@ -152,7 +152,7 @@ int saque_deposito_conta(int operacao, Cliente *c, int indice_da_conta,
   }
 }
 
-int transferencia_entre_contas(Cliente *c, int indice_da_conta,
+int transferencia_entre_contas(Cliente **c, int indice_da_conta,
                                FILE *file_agencia, char *nome_do_arquivo) {
   double valor_transferencia;
   char tmp_file_agencia_name[16] = "agency_copy.tbd";
@@ -161,10 +161,10 @@ int transferencia_entre_contas(Cliente *c, int indice_da_conta,
   printf("A taxa de transferência entre contas é de R$ 22.50\n\nDigite a "
          "quantidade que deseja transferir: ");
   scanf("%lf", &valor_transferencia);
-  if (valor_transferencia > (c + indice_da_conta)->saldo_atual - 22.50) {
+  if (valor_transferencia > (*c + indice_da_conta)->saldo_atual - 22.50) {
     printf("Quantia desejada maior que saldo disponível, por favor, "
            "escolha um valor entre: R$0.00 - R$%.2lf\n\n",
-           (c + indice_da_conta)->saldo_atual - 22.50);
+           (*c + indice_da_conta)->saldo_atual - 22.50);
     sleep(1);
     return transferencia_entre_contas(c, indice_da_conta, file_agencia,
                                       nome_do_arquivo);
@@ -199,14 +199,14 @@ int transferencia_entre_contas(Cliente *c, int indice_da_conta,
             putc(x, tmp_file);
           }
           fprintf(tmp_file, "%d %d %s %s %d %.2lf %d",
-                  (c + indice_da_conta)->codigo_cliente,
-                  (c + indice_da_conta)->agencia_num,
-                  (c + indice_da_conta)->nome_cliente,
-                  (c + indice_da_conta)->sobrenome_cliente,
-                  (c + indice_da_conta)->conta_corrente,
-                  (c + indice_da_conta)->saldo_atual - valor_transferencia -
+                  (*c + indice_da_conta)->codigo_cliente,
+                  (*c + indice_da_conta)->agencia_num,
+                  (*c + indice_da_conta)->nome_cliente,
+                  (*c + indice_da_conta)->sobrenome_cliente,
+                  (*c + indice_da_conta)->conta_corrente,
+                  (*c + indice_da_conta)->saldo_atual - valor_transferencia -
                       22.50,
-                  (c + indice_da_conta)->chave_pix);
+                  (*c + indice_da_conta)->chave_pix);
           tmp_count++;
           passou = true;
         } else if (tmp_count == indice_conta_destino) {
@@ -214,13 +214,14 @@ int transferencia_entre_contas(Cliente *c, int indice_da_conta,
             putc(x, tmp_file);
           }
           fprintf(tmp_file, "%d %d %s %s %d %.2lf %d",
-                  (c + indice_conta_destino)->codigo_cliente,
-                  (c + indice_conta_destino)->agencia_num,
-                  (c + indice_conta_destino)->nome_cliente,
-                  (c + indice_conta_destino)->sobrenome_cliente,
-                  (c + indice_conta_destino)->conta_corrente,
-                  (c + indice_conta_destino)->saldo_atual + valor_transferencia,
-                  (c + indice_conta_destino)->chave_pix);
+                  (*c + indice_conta_destino)->codigo_cliente,
+                  (*c + indice_conta_destino)->agencia_num,
+                  (*c + indice_conta_destino)->nome_cliente,
+                  (*c + indice_conta_destino)->sobrenome_cliente,
+                  (*c + indice_conta_destino)->conta_corrente,
+                  (*c + indice_conta_destino)->saldo_atual +
+                      valor_transferencia,
+                  (*c + indice_conta_destino)->chave_pix);
           tmp_count++;
           passou = true;
         }
@@ -236,17 +237,17 @@ int transferencia_entre_contas(Cliente *c, int indice_da_conta,
   }
 }
 
-int movimentar_conta(Cliente *c, int indice_da_conta, int tamanho_agencia,
+int movimentar_conta(Cliente **c, int indice_da_conta, int tamanho_agencia,
                      FILE *file_agencia, char *nome_do_arquivo) {
   int opcao = 0;
   system("clear");
   printf("----------------------------------------\n");
   printf("--------- Movimentação da Conta: -------\n");
   printf("---- Ag: %d -------- Conta: %d ----\n",
-         (c + indice_da_conta)->agencia_num,
-         (c + indice_da_conta)->conta_corrente);
-  printf("--------- Cliente %s %s   \n", (c + indice_da_conta)->nome_cliente,
-         (c + indice_da_conta)->sobrenome_cliente);
+         (*c + indice_da_conta)->agencia_num,
+         (*c + indice_da_conta)->conta_corrente);
+  printf("--------- Cliente %s %s   \n", (*c + indice_da_conta)->nome_cliente,
+         (*c + indice_da_conta)->sobrenome_cliente);
   printf("----------------------------------------\n");
   printf("----------------------------------------\n");
   printf("----------------------------------------\n\n\n");
