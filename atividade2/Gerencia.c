@@ -152,6 +152,74 @@ int saque_deposito_conta(int operacao, Cliente *c, int indice_da_conta,
   }
 }
 
+int transferencia_entre_contas(Cliente *c, int indice_da_conta,
+                               FILE *file_agencia, char *nome_do_arquivo) {
+  double valor_transferencia;
+  char tmp_file_agencia_name[16] = "agency_copy.tbd";
+  int conta_destino;
+
+  printf("A taxa de transferência entre contas é de R$ 22.50\n\nDigite a "
+         "quantidade que deseja transferir: ");
+  scanf("%lf", &valor_transferencia);
+  if (valor_transferencia > (c + indice_da_conta)->saldo_atual - 22.50) {
+    printf("Quantia desejada maior que saldo disponível, por favor, "
+           "escolha um valor entre: R$0.00 - R$%.2lf\n\n",
+           (c + indice_da_conta)->saldo_atual - 22.50);
+    sleep(1);
+    return transferencia_entre_contas(c, indice_da_conta, file_agencia,
+                                      nome_do_arquivo);
+  } else {
+    printf("Informe a conta que receberá este valor: ");
+    scanf("%d", conta_destino);
+    bool conta_destino_existe = false;
+    int indice_conta_destino;
+    indice_conta_destino = encontrar_conta(c, conta_destino, 10);
+    printf("Preparando para realizar a transferência...\n\n");
+    sleep(2);
+    rewind(file_agencia);
+    FILE *tmp_file = fopen(tmp_file_agencia_name, "w");
+    char x;
+    bool passou = false;
+    int tmp_count = 0;
+    x = getc(file_agencia);
+    while (x != EOF) {
+      if (x == '\n') {
+        tmp_count++;
+        passou = false;
+      }
+      if (tmp_count != indice_da_conta) {
+        if (!passou) {
+          putc(x, tmp_file);
+        }
+      } else {
+        if (x == '\n') {
+          putc(x, tmp_file);
+        }
+        fprintf(tmp_file, "%d %d %s %s %d %.2lf %d",
+                (c + indice_da_conta)->codigo_cliente,
+                (c + indice_da_conta)->agencia_num,
+                (c + indice_da_conta)->nome_cliente,
+                (c + indice_da_conta)->sobrenome_cliente,
+                (c + indice_da_conta)->conta_corrente,
+                (c + indice_da_conta)->saldo_atual - valor_transferencia -
+                    22.50,
+                (c + indice_da_conta)->chave_pix);
+        tmp_count++;
+        passou = true;
+      }
+      x = getc(file_agencia);
+    }
+    fclose(file_agencia);
+    fclose(tmp_file);
+    remove(nome_do_arquivo);
+    rename(tmp_file_agencia_name, nome_do_arquivo);
+    file_agencia = fopen(nome_do_arquivo, "a+");
+    tmp_file = fopen(tmp_file_agencia_name, "w");
+
+    return 0;
+  }
+}
+
 int movimentar_conta(Cliente *c, int indice_da_conta, int tamanho_agencia,
                      FILE *file_agencia, char *nome_do_arquivo) {
   int opcao = 0;
@@ -173,13 +241,13 @@ int movimentar_conta(Cliente *c, int indice_da_conta, int tamanho_agencia,
     switch (opcao) {
     case 1:
     case 2:
-      saque_deposito_conta(opcao, c, indice_da_conta);
-      atualizaClientes(c, 10, file_agencia);
+      saque_deposito_conta(opcao, c, indice_da_conta, file_agencia,
+                           nome_do_arquivo);
+      atualiza_clientes(c, 10, file_agencia);
       break;
     case 3:
       break;
     case 4:
-      transferencia_entre_contas();
       break;
     case 9:
       printf("Retornando ao menu gerencial");
