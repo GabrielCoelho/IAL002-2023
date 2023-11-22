@@ -2,6 +2,7 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <unistd.h>
 
 int exibe_inicio_banco() {
@@ -45,15 +46,16 @@ void atualiza_clientes(Cliente *c, int tamanho_agencia, FILE *file_agencia) {
   }
 }
 
-void exibe_saldo(Cliente *c, int indice) {
+void exibe_saldo(Cliente *c, int indice_da_conta) {
   system("clear");
   printf("----------------------------------------\n");
   printf("--------- Saldo da Conta: -------\n");
-  printf("---- Ag: %d -------- Conta: %d ----\n", (c + indice)->agencia_num,
-         (c + indice)->conta_corrente);
-  printf("--------- Cliente %s %s   \n", (c + indice)->nome_cliente,
-         (c + indice)->sobrenome_cliente);
-  printf("--------- SALDO: R$ %.2lf\n", (c + indice)->saldo_atual);
+  printf("---- Ag: %d -------- Conta: %d ----\n",
+         (c + indice_da_conta)->agencia_num,
+         (c + indice_da_conta)->conta_corrente);
+  printf("--------- Cliente %s %s   \n", (c + indice_da_conta)->nome_cliente,
+         (c + indice_da_conta)->sobrenome_cliente);
+  printf("--------- SALDO: R$ %.2lf\n", (c + indice_da_conta)->saldo_atual);
   printf("----------------------------------------\n\n\n");
   printf("Retornando ao menu gerencial em 5 segundos...\n\n");
   sleep(5);
@@ -81,9 +83,79 @@ int encontrar_conta(Cliente *c, int conta_buscada, int tamanho_agencia) {
   }
   return 20; // se retornar 20, é porque não foi encontrada
 }
+int saque_deposito_conta(int operacao, Cliente *c, int indice_da_conta,
+                         FILE *file_agencia, char *nome_do_arquivo) {
+  double valor_saque_dep;
+  char mensagem_inicio[11], mensagem_operacao[11],
+      tmp_file_agencia_name[16] = "agency_copy.tbd";
+
+  if (operacao == 1) {
+    strcpy(mensagem_inicio, "sacar");
+    strcpy(mensagem_operacao, "saque");
+  } else if (operacao == 2) {
+    strcpy(mensagem_inicio, "depositar");
+    strcpy(mensagem_operacao, "depósito");
+  }
+
+  printf("Digite a quantidade que deseja %s: ", mensagem);
+  scanf("%lf", &valor_saque_dep);
+  if (valor_saque_dep > (c + indice_da_conta)->saldo_atual) {
+    printf("Quantia desejada maior que saldo disponível, por favor, "
+           "escolha um valor entre: R$0.00 - R$%.2lf\n\n",
+           (c + indice_da_conta)->saldo_atual);
+    sleep(1);
+    return saque_deposito_conta(operacao, c, indice_da_conta, file_agencia,
+                                nome_do_arquivo);
+  } else {
+    printf("Preparando para realizar o saque...\n\n");
+    sleep(2);
+    rewind(file_agencia);
+    FILE *tmp_file = fopen(tmp_file_agencia_name, "w");
+    char c;
+    bool passou = false;
+    int tmp_count = 0;
+    c = getc(file_agencia);
+    while (c != EOF) {
+      if (c == '\n') {
+        tmp_count++;
+        passou = false;
+      }
+      if (tmp_count != indice_da_conta) {
+        if (!passou) {
+          putc(c, tmp_file);
+        }
+      } else {
+        if (c == '\n') {
+          putc(c, tmp_file);
+        }
+        fprintf(tmp_file, "%d %d %s %s %d %.2lf %d",
+                (c + indice_da_conta)->codigo_cliente,
+                (conta + indice)->agencia_num,
+                (c + indice_da_conta)->nome_cliente,
+                (c + indice_da_conta)->sobrenome_cliente,
+                (c + indice_da_conta)->conta_corrente,
+                operacao == 1
+                    ? (c + indice_da_conta)->saldo_atual - valor_saque_dep
+                    : (c + indice_da_conta)->saldo_atual + valor_saque_dep,
+                (c + indice_da_conta)->chave_pix);
+        tmp_count++;
+        passou = true;
+      }
+      c = getc(file_agencia);
+    }
+    fclose(file_agencia);
+    fclose(tmp_file);
+    remove(nome_do_arquivo);
+    rename(tmp_file_agencia_name, nome_do_arquivo);
+    file_agencia = fopen(nome_do_arquivo, "a+");
+    atualizaClientes(c, 10, file_agencia);
+    return 0;
+  }
+}
 
 int movimentar_conta(Cliente *c, int indice_da_conta, int tamanho_agencia,
                      FILE *file_agencia, char *nome_do_arquivo) {
+  int opcao = 0;
   system("clear");
   printf("----------------------------------------\n");
   printf("--------- Movimentação da Conta: -------\n");
@@ -95,4 +167,24 @@ int movimentar_conta(Cliente *c, int indice_da_conta, int tamanho_agencia,
   printf("----------------------------------------\n");
   printf("----------------------------------------\n");
   printf("----------------------------------------\n\n\n");
+  while (opcao == 0) {
+    printf("Selecione a partir do menu abaixo: \n1. Saque\t2. Depósito\n3. "
+           "Pix\t\t4. Transferência\n9. Voltar ao menu gerencial\n");
+    scanf("%d", &opcao);
+    switch (opcao) {
+    case 1:
+    case 2:
+      saque_deposito_conta(opcao, c, indice_da_conta);
+      break;
+    case 3:
+      break;
+    case 4:
+      break;
+    case 9:
+      printf("Retornando ao menu gerencial");
+      sleep(2);
+      return 1;
+    }
+  }
+  return 0;
 }
