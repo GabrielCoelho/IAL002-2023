@@ -8,12 +8,13 @@
 
 int main(int argc, char *argv[]) {
   Cliente clientes_agencia[10];
-  Cliente *c = clientes_agencia;
+  // Cliente *c = clientes_agencia;
   char arquivo_nome[10] = "banco.tbd";
   FILE *arquivo_agencia = fopen(arquivo_nome, "a+");
   int senha_banco_gerencia = 0, resp_menu_gerente = 0, menu_movimentacao = 0,
       clientes_cadastrados = verifica_cadastrados(arquivo_agencia),
       conta_buscada, indice_encontrado;
+  atualiza_clientes(clientes_agencia, 10, arquivo_agencia);
 
   while (senha_banco_gerencia == 0) {
     senha_banco_gerencia = exibe_inicio_banco();
@@ -28,8 +29,9 @@ int main(int argc, char *argv[]) {
         resp_menu_gerente = exibe_menu_gerente();
         switch (resp_menu_gerente) {
         case 1:
-          menu_movimentacao = movimentar_conta(&c, clientes_cadastrados, 10,
-                                               arquivo_agencia, arquivo_nome);
+          menu_movimentacao =
+              movimentar_conta(clientes_agencia, clientes_cadastrados, 10,
+                               arquivo_agencia, arquivo_nome);
           if (menu_movimentacao == 1) {
             resp_menu_gerente = 0;
           } else {
@@ -44,12 +46,13 @@ int main(int argc, char *argv[]) {
         case 3:
           printf("Por favor, informe o número da conta: ");
           scanf("%d", &conta_buscada);
-          indice_encontrado = encontrar_conta(&c, conta_buscada, 10);
+          indice_encontrado =
+              encontrar_conta(clientes_agencia, conta_buscada, 10);
           if (indice_encontrado == 20) {
             printf("Conta não encontrada\nRetornando ao menu gerencial\n\n");
             sleep(2);
           } else {
-            exibe_saldo(&c, indice_encontrado);
+            exibe_saldo(clientes_agencia, indice_encontrado);
           }
           resp_menu_gerente = 0;
           break;
