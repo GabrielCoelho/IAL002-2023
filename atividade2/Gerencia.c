@@ -115,7 +115,6 @@ int saque_deposito_conta(int operacao, Cliente c[], int indice_da_conta) {
   double valor_saque_dep;
   char mensagem_inicio[11], mensagem_operacao[11],
       tmp_file_agencia_name[16] = "agency_copy.tbd";
-
   if (operacao == 1) {
     strcpy(mensagem_inicio, "sacar");
     strcpy(mensagem_operacao, "saque");
@@ -123,7 +122,6 @@ int saque_deposito_conta(int operacao, Cliente c[], int indice_da_conta) {
     strcpy(mensagem_inicio, "depositar");
     strcpy(mensagem_operacao, "depósito");
   }
-
   printf("Digite a quantidade que deseja %s: ", mensagem_inicio);
   scanf("%lf", &valor_saque_dep);
   if (valor_saque_dep > c[indice_da_conta].saldo_atual && operacao == 1) {
@@ -150,7 +148,6 @@ int transferencia_entre_contas(Cliente c[], int indice_da_conta) {
   double valor_transferencia;
   char tmp_file_agencia_name[16] = "agency_copy.tbd";
   int conta_destino;
-
   printf("A taxa de transferência entre contas é de R$ 22.50\n\nDigite a "
          "quantidade que deseja transferir: ");
   scanf("%lf", &valor_transferencia);
@@ -184,7 +181,6 @@ int pix_entre_contas(Cliente c[], int indice_da_conta) {
   double valor_pix;
   char tmp_file_agencia_name[16] = "agency_copy.tbd";
   int pix_destino;
-
   printf("\nDigite a quantidade que deseja transferir: ");
   scanf("%lf", &valor_pix);
   if (valor_pix > c[indice_da_conta].saldo_atual) {
@@ -250,4 +246,86 @@ int movimentar_conta(Cliente c[], int indice_da_conta, int tamanho_agencia) {
     }
   }
   return 1;
+}
+
+void cria_conta_cliente(Cliente *c, int tamanho_agencia) {
+  int verifica_conta = 0, verifica_agencia = 0, chave_pix = 0;
+  if (tamanho_agencia == 10) {
+    printf("A agência está cheia e, infelizmente, não comportamos mais "
+           "clientes.\nMas não fique chateado, estamos em constante "
+           "crescimento e em breve teremos mais espaço em nossos cofres\n\n ");
+  } else {
+    c[tamanho_agencia].codigo_cliente = tamanho_agencia + 1;
+    printf("Muito bem, precisaremos de alguns dados do cliente\nPor favor, "
+           "digite o Primeiro nome do Cliente\nObs: Se for nome composto, "
+           "indique só o primeiro. (Ex: Ana Júlia, indique só Ana)\nNome: ");
+    scanf("%s", c[tamanho_agencia].nome_cliente);
+    printf("Agora, escreva o último sobrenome do cliente: ");
+    scanf("%s", c[tamanho_agencia].sobrenome_cliente);
+    printf("Digite o número da conta: ");
+    while (verifica_conta == 0) {
+      scanf("%d", &verifica_conta);
+      if (encontrar_conta(c, verifica_conta, tamanho_agencia) == 20) {
+        c[tamanho_agencia].conta_corrente = verifica_conta;
+      } else {
+        if (encontrar_conta(c, verifica_conta + 123, tamanho_agencia) == 20) {
+          c[tamanho_agencia].conta_corrente = verifica_conta + 123;
+          printf("A conta indicada já existe.\nPor padrão, adicionamos 123"
+                 "unidades ao valor inserido\nNúmero da Conta Corrente do "
+                 "cliente %s %s: %d \n",
+                 c[tamanho_agencia].nome_cliente,
+                 c[tamanho_agencia].sobrenome_cliente,
+                 c[tamanho_agencia].conta_corrente);
+        } else {
+          printf("Conta já existente e o padrão não pode ser aplicado\nDigite "
+                 "outro número da conta");
+          verifica_conta = 0;
+        }
+      }
+    }
+    while (verifica_agencia == 0) {
+      printf("por fim, indique a agência na qual a conta será criada, "
+             "lembrando:\n123 - Mogi Guaçu\t\t125 - Mogi Mirim\n129 - "
+             "Itapira\t\t130 - Estiva Gerbi\n\n Agência: ");
+      scanf("%d", &verifica_agencia);
+      switch (verifica_agencia) {
+      case 123:
+      case 125:
+      case 129:
+      case 130:
+        c[tamanho_agencia].agencia_num = verifica_agencia;
+        break;
+      default:
+        printf("Por favor, digite uma agência existente\n\n");
+        sleep(1);
+        verifica_agencia = 0;
+        break;
+      }
+    }
+    printf("Agora iremos criar a chave pix para esta conta!\nO padrão são "
+           "quatro números, podendo inserir mais ou menos\n");
+    printf("Informe a chave desejada: ");
+    while (chave_pix == 0) {
+      scanf("%d", &chave_pix);
+      if (encontrar_pix(c, chave_pix, tamanho_agencia) == 20) {
+        c[tamanho_agencia].chave_pix = chave_pix;
+      } else {
+        if (encontrar_pix(c, chave_pix + 130, tamanho_agencia) == 20) {
+
+          c[tamanho_agencia].chave_pix = chave_pix + 130;
+          printf(
+              "Tal chave já consta em nosso sistema\nPor padrão adicionamos "
+              "130 unidades à chave pix informada para criar uma nova\nChave "
+              "PIX da conta do cliente %s %s: %d",
+              c[tamanho_agencia].nome_cliente,
+              c[tamanho_agencia].sobrenome_cliente,
+              c[tamanho_agencia].chave_pix);
+        } else {
+          printf("Chave PIX já consta no sistema e o padrão não pôde ser "
+                 "aplicado\nPor favor, digite uma chave diferente: ");
+          chave_pix = 0;
+        }
+      }
+    }
+  }
 }

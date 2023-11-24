@@ -14,4 +14,5 @@ int saque_deposito_conta(int operacao, Cliente c[], int indice_da_conta);
 int transferencia_entre_contas(Cliente c[], int indice_da_conta);
 int pix_entre_contas(Cliente c[], int indice_da_conta);
 int movimentar_conta(Cliente c[], int indice_da_conta, int tamanho_agencia);
+void cria_conta_cliente(Cliente c[], int tamanho_agencia);
 #endif // !GERENCIA_H_INCLUDED

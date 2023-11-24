@@ -8,7 +8,6 @@
 
 int main(int argc, char *argv[]) {
   Cliente clientes_agencia[10];
-  // Cliente *c = clientes_agencia;
   char arquivo_nome[10] = "banco.tbd";
   int senha_banco_gerencia = 0, resp_menu_gerente = 0, menu_movimentacao = 0,
       clientes_cadastrados = verifica_cadastrados(), conta_buscada,
@@ -53,6 +52,11 @@ int main(int argc, char *argv[]) {
           }
           break;
         case 2:
+          cria_conta_cliente(clientes_agencia, clientes_cadastrados);
+          clientes_cadastrados++;
+          printf("Conta cadastrada com sucesso!\n\n");
+          sleep(1);
+          resp_menu_gerente = 0;
           break;
         case 3:
           printf("Por favor, informe o número da conta: ");
