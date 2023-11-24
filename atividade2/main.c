@@ -10,11 +10,10 @@ int main(int argc, char *argv[]) {
   Cliente clientes_agencia[10];
   // Cliente *c = clientes_agencia;
   char arquivo_nome[10] = "banco.tbd";
-  FILE *arquivo_agencia = fopen(arquivo_nome, "a+");
   int senha_banco_gerencia = 0, resp_menu_gerente = 0, menu_movimentacao = 0,
-      clientes_cadastrados = verifica_cadastrados(arquivo_agencia),
-      conta_buscada, indice_encontrado;
-  atualiza_clientes(clientes_agencia, 10, arquivo_agencia);
+      clientes_cadastrados = verifica_cadastrados(), conta_buscada,
+      indice_encontrado;
+  atualiza_clientes(clientes_agencia, 10);
 
   while (senha_banco_gerencia == 0) {
     senha_banco_gerencia = exibe_inicio_banco();
@@ -29,16 +28,28 @@ int main(int argc, char *argv[]) {
         resp_menu_gerente = exibe_menu_gerente();
         switch (resp_menu_gerente) {
         case 1:
-          menu_movimentacao =
-              movimentar_conta(clientes_agencia, clientes_cadastrados, 10,
-                               arquivo_agencia, arquivo_nome);
-          if (menu_movimentacao == 1) {
-            resp_menu_gerente = 0;
+          printf("\nDigite o número da conta a ser movimentada: ");
+          scanf("%d", &conta_buscada);
+          indice_encontrado =
+              encontrar_conta(clientes_agencia, conta_buscada, 10);
+          if (indice_encontrado != 20) {
+            printf("Conta encontrada em nosso sistema\nAguarde a leitura dos "
+                   "dados\n\n");
+            sleep(3);
+            menu_movimentacao =
+                movimentar_conta(clientes_agencia, indice_encontrado, 10);
+            if (menu_movimentacao == 1) {
+              resp_menu_gerente = 0;
+            } else {
+              printf(
+                  "Pane no sistema, alguma coisa está desconfigurada\nSaindo "
+                  "do programa com segurança...");
+              sleep(4);
+              return 0;
+            }
           } else {
-            printf("Pane no sistema, alguma coisa está desconfigurada\nSaindo "
-                   "do programa com segurança...");
-            sleep(4);
-            return 0;
+            printf("Conta não encontrada, por favor, tente novamente\n\n");
+            resp_menu_gerente = 0;
           }
           break;
         case 2:
@@ -57,6 +68,7 @@ int main(int argc, char *argv[]) {
           resp_menu_gerente = 0;
           break;
         case 9:
+          senha_banco_gerencia = 0;
           break;
         default:
           break;
@@ -65,7 +77,17 @@ int main(int argc, char *argv[]) {
       break;
     case 9:
       printf("Obrigado por utilizar nosso programa!\nSaindo com segurança...");
-      sleep(1);
+      FILE *file_agencia = fopen(arquivo_nome, "w");
+      for (int i = 0; i < clientes_cadastrados; i++) {
+        fprintf(file_agencia, "%d %d %s %s %d %.2lf %d\n",
+                clientes_agencia[i].codigo_cliente,
+                clientes_agencia[i].agencia_num,
+                clientes_agencia[i].nome_cliente,
+                clientes_agencia[i].sobrenome_cliente,
+                clientes_agencia[i].conta_corrente,
+                clientes_agencia[i].saldo_atual, clientes_agencia[i].chave_pix);
+      }
+      sleep(2);
       break;
     default:
       printf("Não temos nenhuma agência com este número.\nPara entrar no "
