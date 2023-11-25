@@ -5,6 +5,9 @@
 #include <string.h>
 #include <unistd.h>
 
+/** Exibe Início Banco()
+ * Retorna o valor digitado do menu exibido no terminal
+ */
 int exibe_inicio_banco() {
   int recebe_agencia;
   system("clear");
@@ -12,13 +15,16 @@ int exibe_inicio_banco() {
   printf("------ Banco do Batata - v1.1.9 --------\n");
   printf("----------------------------------------\n\n\n");
   printf("Agências em toda a região da Baixa Mogiana \n123 - Mogi Guaçu\t125 "
-         "- Mogi Mirim\n129 - Itapira\t130 - Estiva Gerbi\n9 - Para sair do "
+         "- Mogi Mirim\n129 - Itapira\t\t130 - Estiva Gerbi\n9 - Para sair do "
          "programa\n");
   printf("\n\nDigite qualquer número de agência para entrar no sistema: ");
   scanf("%d", &recebe_agencia);
   return recebe_agencia;
 }
 
+/** Exibe Menu Gerente()
+ * Retorna o valor digitado do menu exibido no terminal
+ */
 int exibe_menu_gerente() {
   int recebe_menu;
   system("clear");
@@ -35,6 +41,13 @@ int exibe_menu_gerente() {
   return recebe_menu;
 }
 
+/** Atualiza Clientes
+ * Abre o arquivo do banco de dados para inserir no struct os clientes
+ * cadastrados
+ * @see verifica_cadastrados()
+ * @param c[] um array da struct Cliente
+ * @param tamanho_agencia um inteiro contendo os clientes já cadastrados.
+ */
 void atualiza_clientes(Cliente c[], int tamanho_agencia) {
   FILE *file_agencia = fopen("banco.tbd", "r");
   int contagem_clientes = 0;
@@ -46,13 +59,16 @@ void atualiza_clientes(Cliente c[], int tamanho_agencia) {
                 &c[contagem_clientes].conta_corrente,
                 &c[contagem_clientes].saldo_atual,
                 &c[contagem_clientes].chave_pix) != EOF) {
-    // printf("Código: %d\nAgência: %d\nNome: %s %s\nConta: %d\nSaldo: "
-    // "%.2lf\nPIX: %d\n\n",
-    // c[contagem_clientes].codigo_cliente,
-    // c[contagem_clientes].agencia_num, c[contagem_clientes].nome_cliente,
-    // c[contagem_clientes].sobrenome_cliente,
-    // c[contagem_clientes].conta_corrente,
-    // c[contagem_clientes].saldo_atual, c[contagem_clientes].chave_pix);
+    /* Imprime na tela o cliente recebido
+     * funcionalidade de teste somente
+    printf("Código: %d\nAgência: %d\nNome: %s %s\nConta: %d\nSaldo: "
+    "%.2lf\nPIX: %d\n\n",
+    c[contagem_clientes].codigo_cliente,
+    c[contagem_clientes].agencia_num, c[contagem_clientes].nome_cliente,
+    c[contagem_clientes].sobrenome_cliente,
+    c[contagem_clientes].conta_corrente,
+    c[contagem_clientes].saldo_atual, c[contagem_clientes].chave_pix);
+     */
     contagem_clientes++;
     if (contagem_clientes == 10) {
       break;
@@ -61,6 +77,14 @@ void atualiza_clientes(Cliente c[], int tamanho_agencia) {
   fclose(file_agencia);
 }
 
+/** Exibe Saldo
+ * Durante 5 segundos, exibe o saldo da conta digitada. Após o tempo
+ * estabelecido, retorna ao menu anterior
+ * @param c[] um array do struct Cliente
+ * @param indice_da_conta um inteiro contendo o índice do array para o outro
+ * @see encontrar_conta()
+ * parâmetro
+ */
 void exibe_saldo(Cliente c[], int indice_da_conta) {
   system("clear");
   printf("----------------------------------------\n");
@@ -75,6 +99,10 @@ void exibe_saldo(Cliente c[], int indice_da_conta) {
   sleep(5);
 }
 
+/** Verifica cadastrados()
+ * Passa pelo arquivo do banco de dados recebendo a quantidade de clientes
+ * cadastrados
+ */
 int verifica_cadastrados() {
   char c;
   int quantidade_cadastrado = 0;
@@ -84,9 +112,16 @@ int verifica_cadastrados() {
     if (c == '\n')             // ao se deparar com uma quebra de linha
       quantidade_cadastrado++; // adiciona 1 ao contador
   }
+  fclose(file_agencia);
   return quantidade_cadastrado; // retornando a quantidade cadastrada
 }
 
+/** Encontrar Conta()
+ * Retorna o índice da conta buscada caso ela exista no banco de dados
+ * @param c[] array do struct Cliente
+ * @param conta_buscada inteiro com a conta digitada pelo usuário
+ * @param tamanho_agencia inteiro com a quantidade de clientes cadastrados
+ */
 int encontrar_conta(Cliente c[], int conta_buscada, int tamanho_agencia) {
   bool conta_encontrada = false;
   for (int i = 0; i < tamanho_agencia; i++) {
@@ -99,18 +134,35 @@ int encontrar_conta(Cliente c[], int conta_buscada, int tamanho_agencia) {
   return 20; // se retornar 20, é porque não foi encontrada
 }
 
+/** Encontrar PIX()
+ * Retorna o índice da conta em que a chave PIX está cadastrada, caso exista no
+ * banco de dados
+ * @param c[] array do struct Cliente
+ * @param conta_buscada inteiro com a chave PIX digitada pelo usuário
+ * @param tamanho_agencia inteiro com a quantidade de clientes cadastrados
+ */
 int encontrar_pix(Cliente c[], int conta_buscada, int tamanho_agencia) {
   bool conta_encontrada = false;
   for (int i = 0; i < tamanho_agencia; i++) {
     if (conta_buscada == c[i].chave_pix) {
       conta_encontrada = true;
-      return i; // Retorna o indice do struct em qual a conta buscada está
+      return i; // Retorna o indice do struct em qual o pix buscado está
                 // armazenado
     }
   }
   return 20; // se retornar 20, é porque não foi encontrada
 }
 
+/** Saque ou Depósito na Conta()
+ * Realiza saque ou depósito a partir de uma conta existente.
+ * @see movimentar_conta()
+ * @param operacao inteiro contendo qual operação será realizada:
+ *    1: saque    2: depósito
+ * @param c[] array do struct Cliente
+ * @param indice_da_conta inteiro contendo o índice da conta a ser movimentada
+ * está no array
+ * @see encontrar_conta()
+ */
 int saque_deposito_conta(int operacao, Cliente c[], int indice_da_conta) {
   double valor_saque_dep;
   char mensagem_inicio[11], mensagem_operacao[11],
@@ -144,6 +196,15 @@ int saque_deposito_conta(int operacao, Cliente c[], int indice_da_conta) {
   }
 }
 
+/** Transferência entre Contas()
+ * Realiza a transferência de dinheiro para outra conta cadastrada. Esta função
+ * tem uma taxa fixa de R$ 22.50 a ser paga no momento da transferência
+ * @param c[] array da struct Cliente
+ * @param indice_da_conta inteiro contendo o indice da conta em movimentação no
+ * array
+ * @see movimentar_conta
+ * @see encontrar_conta
+ */
 int transferencia_entre_contas(Cliente c[], int indice_da_conta) {
   double valor_transferencia;
   char tmp_file_agencia_name[16] = "agency_copy.tbd";
@@ -177,6 +238,14 @@ int transferencia_entre_contas(Cliente c[], int indice_da_conta) {
   }
 }
 
+/** Pix entre contas()
+ * Função para transferir dinheiro entre contas sem taxas a pagar. É necessário
+ * saber o pix da conta destino
+ * @see encontrar_pix()
+ * @param c[] array do struct Cliente
+ * @param indice_da_conta inteiro contendo o indice da conta movimentada no
+ * array
+ */
 int pix_entre_contas(Cliente c[], int indice_da_conta) {
   double valor_pix;
   char tmp_file_agencia_name[16] = "agency_copy.tbd";
@@ -210,6 +279,14 @@ int pix_entre_contas(Cliente c[], int indice_da_conta) {
   }
 }
 
+/** Movimentar Conta()
+ * Menu de movimentação da conta, podendo escolher 4 opções de movimentação ou
+ * voltar ao menu anterior
+ * @param c[] array do struct Cliente
+ * @param indice_da_conta inteiro com o índice da conta a ser movimentada
+ * @param tamanho_agencia inteiro contendo a quantidade total de clientes
+ * cadastrados
+ */
 int movimentar_conta(Cliente c[], int indice_da_conta, int tamanho_agencia) {
   int opcao = 0;
   system("clear");
@@ -248,6 +325,12 @@ int movimentar_conta(Cliente c[], int indice_da_conta, int tamanho_agencia) {
   return 1;
 }
 
+/** Cria conta Cliente()
+ * Função para a criação de uma nova conta e seu armazenamento diretamente no
+ * struct na próxima posição vazia
+ * @param c[] array do struct Cliente
+ * @param tamanho_agencia inteiro contendo a quantidade de clientes cadastrados
+ */
 void cria_conta_cliente(Cliente *c, int tamanho_agencia) {
   int verifica_conta = 0, verifica_agencia = 0, chave_pix = 0;
   if (tamanho_agencia == 10) {
@@ -286,7 +369,7 @@ void cria_conta_cliente(Cliente *c, int tamanho_agencia) {
     while (verifica_agencia == 0) {
       printf("por fim, indique a agência na qual a conta será criada, "
              "lembrando:\n123 - Mogi Guaçu\t\t125 - Mogi Mirim\n129 - "
-             "Itapira\t\t130 - Estiva Gerbi\n\n Agência: ");
+             "Itapira\t\t\t130 - Estiva Gerbi\n\n Agência: ");
       scanf("%d", &verifica_agencia);
       switch (verifica_agencia) {
       case 123:
@@ -311,7 +394,6 @@ void cria_conta_cliente(Cliente *c, int tamanho_agencia) {
         c[tamanho_agencia].chave_pix = chave_pix;
       } else {
         if (encontrar_pix(c, chave_pix + 130, tamanho_agencia) == 20) {
-
           c[tamanho_agencia].chave_pix = chave_pix + 130;
           printf(
               "Tal chave já consta em nosso sistema\nPor padrão adicionamos "
